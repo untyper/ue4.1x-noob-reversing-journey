@@ -144,21 +144,29 @@ Started with the easy way, from a YT video the steps are very simple.<br>
 - Search the String "MulticastDelegateProperty"<br>
 - Browse memory regions of the found addresses, and find the one in which you read something like "None, ByteProperty, someProperty ecc" scrolling up a bit from where the windows open - 3 results, and the first worked for me:<br>
 <br>
+	
 ![Alt 1-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/1.jpg)
+
 <br>
 - Like you can see I have 16 blank bytes before "None". Find the address of the first byte of the first 8 blank bytes before "None"<br>
 - Search it as 8 bytes HEX, if you find nothing, try the 8 blank bytes before<br>
 - Now just follow back all the pointers you find till you have 2 static addresses - pretty easy, after 2 mins: <br>
 <br>
+
 ![Alt 2-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/2.jpg)
+
 <br>
 - You want to put those offsets in ReClass and use the one that has 2 pointers as first entries:<br>
 <br>
+
 ![Alt 3-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/3.jpg)
+
 <br>
 - Follow the first pointer and:<br>
 <br>
+
 ![Alt 4-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/4.jpg)
+
 <br>
 - That was easy, apparently this is what I need, have I learned something? <br>
 <br>
@@ -218,11 +226,15 @@ Searching for the call at GetNames() in this file led me here (line 678)<br>
 That's juicy, search in IDA the string "Hardcoded name '%s' at index %i was duplicated (or unexpected concurrency). Existing entry is '%s'."<br>
 Follow the XRef, decompile and let's see what we got. Right above the string I can read very clearly "_InterlockedCompareExchenge64", 2 times.<br>
 <br>
+
 ![Alt 5-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/5.jpg)
+
 <br>
 I can see those line also in the source, and GetNames() is even more far up. So let's scroll up.<br>
 <br>
+
 ![Alt 6-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/6.jpg)
+
 <br>
 Wait... can you see 3 times "qword_1421DD6B8"?<br>
 Remember the offset before? 21DD6B8!<br>
@@ -234,7 +246,9 @@ I was confused though: I was searching for GetNames(): a function and that was n
 In IDA functions are like "sub_XXXXXXXX", I started clicking on all function near that point but no luck <img src="https://www.unknowncheats.me/forum/images/smilies/sad.gif" border="0" alt="" title="Frown" class="inlineimg"><br>
 Clicking on the qword itself brought me here, and the function on that line (sub_1401BD5C0) was the same I've already found in the pseudocode with no luck.<br>
 <br>
+
 ![Alt 7-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/7.jpg)
+
 <br>
 Now, I don't know really what I have done here and I'm hoping someone can clear my mind, but here it comes the illumination. <br>
 Remeber in Cheat Engine? When we grabbed the offset, we grabbed the address 16 bytes before the "None".<br>
@@ -243,12 +257,15 @@ In the image you can see that at that adrees there is another function: sub_1401
 <br>
 Clicked it, F5, and discovered that the first thing it does is call another function: sub_1401DA190.<br>
 <br>
+
 ![Alt 8-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/8.jpg)
+
 <br>
 Clicked it, scrolled down a bit and... <img src="https://www.unknowncheats.me/forum/images/smilies/You_Rock_Emoticon.gif" border="0" alt="" title="You Rock Emoticon" class="inlineimg"><br>
 <br>
+
 ![Alt 9-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/9.jpg)
-<i><a rel="nofollow" href="https://ibb.co/K5Bx2P1" target="_blank">https://ibb.co/K5Bx2P1</a></i><br>
+
 <br>
 Interesting that it calls sub_1401BD490 on every Name, I looked a little bit at source code but I didn't understand exactly what I was looking.<br>
 Again, if you want you can clear my mind.<br>
@@ -262,7 +279,9 @@ From what I understand, once I have found Gnames, I can take the array of bytes 
 Downloaded UE4.10 and cooked the FPS Template with PDB.<br>
 Opened in IDA, and it's to easy, just search for it. From a YT video I heard to take the bytes from the "mov" to the "jnz". I'll highlight them for you in the pic.<br>
 <br>
+
 ![Alt 10-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/10.jpg)
+
 <br>
 48 8B 05 B5 8F 1B 02 48 85 C0 75 50<br>
 <br>
@@ -305,7 +324,9 @@ Well, just let's see in the Template Game what I was looking!<br>
 <br>
 I have redone all the steps that I have done in Jumper in the Template and here we are.<br>
 <br>
+	
 ![Alt 11-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/11.jpg)
+
 <br>
 To begin, no sign of GetNames even with the PDB, but in the source is there, just after FName::Hash() <img src="https://www.unknowncheats.me/forum/images/smilies/sad.gif" border="0" alt="" title="Frown" class="inlineimg"><br>
 This is bad, why the source tell me lies <img src="https://www.unknowncheats.me/forum/images/smilies/sad.gif" border="0" alt="" title="Frown" class="inlineimg"><br>
@@ -441,7 +462,9 @@ Let's open our PDB game and let's see if we have done all correct.<br>
 <br>
 Well... it seems I got it <img src="https://www.unknowncheats.me/forum/images/smilies/smile.gif" border="0" alt="" title="Big Grin" class="inlineimg"><br>
 <br>
+	
 ![Alt 12-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/12.jpg)
+
 <br>
 In a YT video a guy said to get the bytes from lea to the call, and that GObject usually starts with 48 8D 0D. <br>
 Let's see... well there are a lot that starts with 48 8D 0D and exactly which lea and call should I use? <br>
@@ -565,21 +588,29 @@ Let's understand first what we need:<br>
 GNames is an array of pointers to names, GNames worked in the dump, so it is good. But let's check it just to understand better.<br>
 The offset is 0x21DD6B8, let's open ReClass and check.<br>
 <br>
+	
 ![Alt 13-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/13.jpg)
+
 <br>
 Ok so we can clearly see there are 2 pointers, let's dereference those and see what they are.<br>
 <br>
+
 ![Alt 14-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/14.jpg)
+
 <br>
 Ok so the first pointer points to other 2 pointers. The second one seems nothing we can use. Let's delete it.<br>
 Let's dereference these other 2 pointers we had from the first one.<br>
 <br>
+
 ![Alt 15-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/15.jpg)
+
 <br>
 Ohh, THAT seems an array. Or better, they seems 2 arrays.<br>
 Let's see what they are pointing, I will open the first 2 pointers of every array for comparison.<br>
 <br>
+
 ![Alt 16-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/16.jpg)
+
 <br>
 Ok we can see a pattern. Every pointer points to an empty region of the size of 0x10. At 0x10 there is our name.<br>
 Like we can see, the first one at offset 0x10 has None. The second has ByteProperty. The first of the second array has MessageIndex. The latter has MessageType.<br>
@@ -616,7 +647,9 @@ Definition of FNameEntry:<br>
 Here we are! So AnsiName is probably our name (None ecc), FNameEntry is a pointer, Index is an int32, but we avance some space if math isn't an opinion. The name was at offset 0x10 so there is probably some extra space between HashNext and the name. <br>
 Let's put all of this in ReClass:<br>
 <br>
+
 ![Alt 17-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/17.jpg)
+
 <br>
 Ok so basically we understand 2 things, indexes goes by 2, because... yes.<br>
 We see 2 arrays, and the first element of the second has index 32768. 32768/2 = 16384! The number we've seen in the definition! All make sense.<br>
@@ -627,11 +660,15 @@ At the and we have a structure like this:<br>
 <br>
 - Our offset points to all the arrays with names in it<br>
 <br>
+
 ![Alt 18-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/18.jpg)
+
 <br>
 - Those pointers refers to the vary entries of those arrays:<br>
 <br>
+
 ![Alt 19-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/19.jpg)
+
 <br>
 Simple like drinking a glass of water, like we say here.<br>
 <br>
@@ -642,17 +679,23 @@ So now.. our enemy.<br>
 We start with 2 offsets but they are very close, let's put the smaller one so we can see even the other in ReClass.<br>
 0x21EDE70 or 0x21EDE80<br>
 <br>
+
 ![Alt 20-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/20.jpg)
+
 <br>
 Ok the pointers are at 0x..80 so the one I picked from IDA was wrong. But come on, so close, UFT gave me the 80 one but I am confident that even without it I would have it spotted.<br>
 <br>
 Let's dereference those:<br>
 <br>
+
 ![Alt 21-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/21.jpg)
+
 <br>
 Ok it seems we have already two arrays, seems very similar to the GNames structure. Let's open the first two of every array:<br>
 <br>
+
 ![Alt 22-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/22.jpg)
+
 <br>
 Oh we are of course watching to an array of similar objects. On the internet I've seen what an UObject should look like, and the only thing clearly equal to those I've seen on the web is the first pointer: that should be a VTable.<br>
 Now let's look at the source and let's see if we can understand the structure.<br>
@@ -691,13 +734,17 @@ Ok so basically FName has an index (int32). This integer refer to the GName arra
 For every object we take, we see that index, search that index in the Name array and we have the name of the object!<br>
 All clear, let's try to put that in ReClass and if matches:<br>
 <br>
+
 ![Alt 23-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/23.jpg)
+
 <br>
 This seems pretty good to me, InternalIndex grows by one this time (0, 1 - 16384, 16385), 16384 is the first of the second chunk: 16384 / 1 = 16384 (remeber the definition of TUObjectArray?) and we see the FName Index, apparently the first one has Index 688, and in my dump of GNames that is CoreUObject.<br>
 <br>
 Ok so let's go backwards and define all.<br>
 <br>
+
 ![Alt 24-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/24.jpg)
+
 <br>
 2 things: <br>
 - this structure is one pointer shorter than GNames like we can see, basically it's like what I've called here GObject is at the same level of what I've called PtrToAllNameEntryArray in the GNames ReClass.<br>
@@ -724,7 +771,9 @@ Very basic, let's see onAttach() then:<br>
 </div>
 Ok, now Names works, so let' see what it's doing, it takes the offset and it dereference it so the program wants the pointer to the first chunk, this one for understand:<br>
 <br>
+
 ![Alt 25-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/25.jpg)
+
 <br>
 Well the GObject offset we are giving points already to the same location but for the objects so no need to dereference: <br>
 <br>
@@ -835,7 +884,9 @@ and...<br>
 <br>
 <img src="https://www.unknowncheats.me/forum/images/smilies/cool.gif" border="0" alt="" title="Cool" class="inlineimg"> IT WORKS <img src="https://www.unknowncheats.me/forum/images/smilies/cool.gif" border="0" alt="" title="Cool" class="inlineimg"><br>
 <br>
+
 ![Alt 26-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/26.jpg)
+
 <br>
 Wow I wasn't expect it, uhm ok.<br>
 <br>
