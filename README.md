@@ -1,7 +1,11 @@
 # UE4.1x Noob Reversing Journey
 
-<div id="post_message_3030862"><b>INTRODUCTION</b><br>
-<br>
+All credit to <b>@cafo678</b> at https://www.unknowncheats.me/forum/members/3653138.html
+
+Forum thread: https://www.unknowncheats.me/forum/unreal-engine-4-a/435110-noob-journey-ue4-hacking.html
+
+
+## INTRODUCTION
 Hi guys,<br>
 <br>
 First things first, I'm Italian and my english can be very bad, please excuse me.<br>
@@ -14,22 +18,6 @@ Third, don't know why the images can't load.<br>
 If you want just to help me, thanks and please jump directly at the end where there are my questions.<br>
 <br>
 Here a lot of info on why I'm here, what I want to achieve, mainly implemented to let you know why I'm even writing this post (you can skip, I wont blame you):<br>
-<br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">
-<input type="button" value="Hide Spoiler!" style="width:100px;font-size:14px;font-bold:true;margin:10px;padding:0px;" onclick="if (this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display != '') 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = ''; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = 'none'; 
-this.value = 'Hide Spoiler!'; 
-} 
-else 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = 'none'; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = ''; 
-this.value = 'Show Spoiler!'; 
-}">
-<div id="show_spoil" style="margin: 0px; border-style: solid; border-width: 1px; padding: 4px; width: 98%;">
 <br>
 I'm a UE4 Gameplay programmer from 6 months, made a couple of projects for myself to start looking for a job.<br>
 I know how the engine works at the top level, but know nothing on how the engine works on low level. Pretty good on C++.<br>
@@ -48,50 +36,13 @@ Joined Cyberpunk discord before Christmas while starting to do some tuts here an
 <br>
 So I've switched very fast to my next idea: FFVII.<br>
 The game should come out on April, and I have a few months to get ready to know how I could implement the things I have in my mind. Plus is made with UE4, a Engine I already use, this is perfect!<br>
-</div>
-<div id="hide_spoil" style="display: none;">
-</div>
-</div>
-</div><br>
-<br>
+
 So I started to search how to mod UE4 Games, discovered that before modding them you have to reverse them, did some other research and now I think to have a pretty clear idea on how to proceed, I'll Implement the steps as I go forward.<br>
-<br>
-<b>JOURNEY</b><br>
-<br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">
-<input type="button" value="Hide Spoiler!" style="width:100px;font-size:14px;font-bold:true;margin:10px;padding:0px;" onclick="if (this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display != '') 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = ''; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = 'none'; 
-this.value = 'Hide Spoiler!'; 
-} 
-else 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = 'none'; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = ''; 
-this.value = 'Show Spoiler!'; 
-}">
-<div id="show_spoil" style="margin: 0px; border-style: solid; border-width: 1px; padding: 4px; width: 98%;">
-<br>
-<b>STEP 1: FINDING GNames &amp;&amp; GObjects</b><br>
-<br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">
-<input type="button" value="Hide Spoiler!" style="width:100px;font-size:14px;font-bold:true;margin:10px;padding:0px;" onclick="if (this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display != '') 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = ''; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = 'none'; 
-this.value = 'Hide Spoiler!'; 
-} 
-else 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = 'none'; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = ''; 
-this.value = 'Show Spoiler!'; 
-}">
-<div id="show_spoil" style="margin: 0px; border-style: solid; border-width: 1px; padding: 4px; width: 98%;">
-<br>
+
+## JOURNEY
+	
+### STEP 1: FINDING GNames &amp;&amp; GObjects
+
 Every Unreal Game has 2 very important variables that should help me proceed on my journey:<br>
 <br>
 -GNames is a TArray of Unicode Strings<br>
@@ -101,29 +52,9 @@ With GObjects I should have access to most (all?) objects in the game, with GNam
 These infos will help me build an SDK to mod the game.<br>
 <br>
 So, how to find them? Need to start practice!<br>
-</div>
-<div id="hide_spoil" style="display: none;">
-</div>
-</div>
-</div><br>
-<blockquote><br>
-<b>STEP 1-a: GNames, JUMPER &amp;&amp; FPS TEMPLATE</b><br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">
-<input type="button" value="Hide Spoiler!" style="width:100px;font-size:14px;font-bold:true;margin:10px;padding:0px;" onclick="if (this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display != '') 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = ''; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = 'none'; 
-this.value = 'Hide Spoiler!'; 
-} 
-else 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = 'none'; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = ''; 
-this.value = 'Show Spoiler!'; 
-}">
-<div id="show_spoil" style="margin: 0px; border-style: solid; border-width: 1px; padding: 4px; width: 98%;">
-<br>
+
+### STEP 1-a: GNames, JUMPER &amp;&amp; FPS TEMPLATE
+
 I've found here on the forum a post that talked about Jumper <b>~removed by staff~</b>, free, simple, a little boring, and made with UE4, downloaded.<br>
 <br>
 One thing I know about GNames: they look like "None, ByteProperty, someProperty ecc". <br>
@@ -133,9 +64,9 @@ There are a lot of info on how to find GNames but I found mainly 3 ways of doing
 - Analyzing the EXE with sigs (array of bytes that should be almost identical in every game)<br>
 - Reversing via Source Code and IDA<br>
 - Using fast methods that other people found for me.<br>
-<br>
-<b>EASY METHOD</b><br>
-<br>
+
+#### EASY METHOD
+
 Started with the easy way, from a YT video the steps are very simple.<br>
 - Open Cheat Engine<br>
 - Attach to Jumper<br>
@@ -172,7 +103,7 @@ Started with the easy way, from a YT video the steps are very simple.<br>
 <br>
 But, I have a offset now: 21DD6B8.<br>
 <br>
-<b>IDA &amp;&amp; SOURCE</b><br>
+<b>IDA and SOURCE</b><br>
 <br>
 Let's see if I can find the same info using Source and IDA. Jumper uses UE4.10, I've seen this by simply viewing the proprieties of the EXE.<br>
 <br>
@@ -291,30 +222,9 @@ Oh... that's a problem, none of the function I found look even similar to the on
 <img src="https://www.unknowncheats.me/forum/images/smilies/wtf.gif" border="0" alt="" title="Wtf" class="inlineimg"><br>
 <br>
 It' 4 AM, I'll call it a day, any advice is welcomed <img src="https://www.unknowncheats.me/forum/images/smilies/big_smile.png" border="0" alt="" title="Smilie" class="inlineimg"><br>
-</div>
-<div id="hide_spoil" style="display: none;">
-</div>
-</div>
-</div><br>
-<br>
-<b>STEP 1-b: GNames, JUMPER &amp;&amp; FPS TEMPLATE - Was I looking at GNames? - Quick Update 08/01</b><br>
-<br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">
-<input type="button" value="Hide Spoiler!" style="width:100px;font-size:14px;font-bold:true;margin:10px;padding:0px;" onclick="if (this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display != '') 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = ''; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = 'none'; 
-this.value = 'Hide Spoiler!'; 
-} 
-else 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = 'none'; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = ''; 
-this.value = 'Show Spoiler!'; 
-}">
-<div id="show_spoil" style="margin: 0px; border-style: solid; border-width: 1px; padding: 4px; width: 98%;">
-<br>
+
+### STEP 1-b: GNames, JUMPER and FPS TEMPLATE - Was I looking at GNames? - Quick Update 08/01</b><br>
+
 I know you bastards are probably laughing at me!<br>
 But I have a PDB!<br>
 The question is: Was I looking at GNames?<br>
@@ -327,40 +237,19 @@ I have redone all the steps that I have done in Jumper in the Template and here 
 
 <br>
 To begin, no sign of GetNames even with the PDB, but in the source is there, just after FName::Hash() <img src="https://www.unknowncheats.me/forum/images/smilies/sad.gif" border="0" alt="" title="Frown" class="inlineimg"><br>
-This is bad, why the source tell me lies <img src="https://www.unknowncheats.me/forum/images/smilies/sad.gif" border="0" alt="" title="Frown" class="inlineimg"><br>
-<br>
+This is bad, why the source tell me lies <img src="https://www.unknowncheats.me/forum/images/smilies/sad.gif" border="0" alt="" title="Frown" class="inlineimg">
+
 And:<br>
 - sub_1401BD5C0 is FName::InitInternal_FindOrAddNameEntry()<br>
 - sub_1401BD490 is FName::InitInternal()<br>
 - sub_1401DA190 is FName::StaticInit()<br>
 <br>
-So the answer is: No moron, you wasn't looking at GetNames().<br>
-<br>
+So the answer is: No moron, you wasn't looking at GetNames().
+
 I'm out of ammo here, seems that I have picked the wrong literal string.<br>
-</div>
-<div id="hide_spoil" style="display: none;">
-</div>
-</div>
-</div><br>
-<br>
-<b>STEP 1-c: Time for GObjects - Apparently the offset is good <img src="https://www.unknowncheats.me/forum/images/smilies/smile.gif" border="0" alt="" title="Big Grin" class="inlineimg"> - Update 09/01</b><br>
-<br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">
-<input type="button" value="Hide Spoiler!" style="width:100px;font-size:14px;font-bold:true;margin:10px;padding:0px;" onclick="if (this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display != '') 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = ''; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = 'none'; 
-this.value = 'Hide Spoiler!'; 
-} 
-else 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = 'none'; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = ''; 
-this.value = 'Show Spoiler!'; 
-}">
-<div id="show_spoil" style="margin: 0px; border-style: solid; border-width: 1px; padding: 4px; width: 98%;">
-<br>
+
+### STEP 1-c: Time for GObjects - Apparently the offset is good <img src="https://www.unknowncheats.me/forum/images/smilies/smile.gif" border="0" alt="" title="Big Grin" class="inlineimg"> - Update 09/01
+
 So I have done research and I have understood something but I have not understood the fact that GetNames() is missing in IDA.<br>
 I'll make this one the first question for you.<br>
 <br>
@@ -397,8 +286,7 @@ Find ref, find literals, you know how it works, I'm using "Object not found" fro
 <br>
 4 results, we can do this.<br>
 <br>
-The first has something weird:<br>
-<br>
+The first has something weird:
 
 ```c++
 
@@ -428,8 +316,7 @@ There isn't any "Property '%s' not found on object '%s'" in my function. Let' se
 <br>
 Found just one result! If there is also here the GetUObjectArray() we can use this!<br>
 <br>
-Source:<br>
-<br>
+Source:
 
 ```c++
 bool UGameViewportClient::HandleDisplayCommand( const TCHAR* Cmd, FOutputDevice& Ar )
@@ -484,8 +371,7 @@ If I find the one that differs in IDA, i know I can use either one of the remain
 Bingo! I can use either one of the latters and it will be or HandleDisplayAllLocationCommand() or HandleDisplayAllRotationCommand().<br>
 They are identical so I don't care, let's take HandleDisplayAllLocationCommand() and sub_140C661A0.<br>
 <br>
-Source:<br>
-<br>
+Source:
 
 ```c++
 bool UGameViewportClient::HandleDisplayAllLocationCommand( const TCHAR* Cmd, FOutputDevice& Ar )
@@ -527,8 +413,7 @@ bool UGameViewportClient::HandleDisplayAllLocationCommand( const TCHAR* Cmd, FOu
 }
 ```
 
-IDA:<br>
-<br>
+IDA:
 
 ```c++
 char __fastcall sub_140C661A0(__int64 a1, __int64 a2, __int64 a3, __int64 a4)
@@ -792,8 +677,7 @@ LABEL_4:
 }
 ```
 
-Got into sub_14026F0F0():<br>
-<br>
+Got into sub_14026F0F0():
 
 ```c++
 
@@ -819,11 +703,9 @@ It's easy to think that our array could be the returned value: dword_1421EDE70, 
 Let's open our PDB game and let's see if we have done all correct.<br>
 <br>
 Well... it seems I got it <img src="https://www.unknowncheats.me/forum/images/smilies/smile.gif" border="0" alt="" title="Big Grin" class="inlineimg"><br>
-<br>
 	
 ![Alt 12-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/12.jpg)
 
-<br>
 In a YT video a guy said to get the bytes from lea to the call, and that GObject usually starts with 48 8D 0D. <br>
 Let's see... well there are a lot that starts with 48 8D 0D and exactly which lea and call should I use? <br>
 <br>
@@ -835,33 +717,9 @@ Fuck, for the time being I'll take the first i meet.<br>
 Template: 48 8D 0D 30 70 10 02 E8 17 0A 4A 01<br>
 Jumper: 48 8D 0D E0 FD F7 01 E8 F7 34 6A 01<br>
 Possible sig: 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? 01<br>
-<br>
-</div>
-<div id="hide_spoil" style="display: none;">
-</div>
-</div>
-</div></blockquote><br>
-<br>
-<b>STEP 2: DUMPING GNames &amp;&amp; GObjects</b><br>
-<br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">
-<input type="button" value="Hide Spoiler!" style="width:100px;font-size:14px;font-bold:true;margin:10px;padding:0px;" onclick="if (this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display != '') 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = ''; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = 'none'; 
-this.value = 'Hide Spoiler!'; 
-} 
-else 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = 'none'; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = ''; 
-this.value = 'Show Spoiler!'; 
-}">
-<div id="show_spoil" style="margin: 0px; border-style: solid; border-width: 1px; padding: 4px; width: 98%;">
-<br>
-So we have offsets, will they work? <br>
-<br>
+
+### STEP 2: DUMPING GNames &amp;&amp; GObjects
+
 Template Game: <br>
 GNames: 0x232F530<br>
 GObjects: 0x23422C0 or 0x23422B0<br>
@@ -873,30 +731,9 @@ GObjects: 0x21EDE80 or 0x21EDE70<br>
 For what I've understood to dump the lists we can use an Instance Logger and inject it in the process.<br>
 I've found one here on the forum made by TheFeckless I think.<br>
 I have to study this code but I want to see if it works simply changing the offsets.<br>
-</div>
-<div id="hide_spoil" style="display: none;">
-</div>
-</div>
-</div><br>
-<blockquote><br>
-<b>STEP 2-a: Dumping JUMPER</b><br>
-<br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">
-<input type="button" value="Hide Spoiler!" style="width:100px;font-size:14px;font-bold:true;margin:10px;padding:0px;" onclick="if (this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display != '') 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = ''; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = 'none'; 
-this.value = 'Hide Spoiler!'; 
-} 
-else 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = 'none'; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = ''; 
-this.value = 'Show Spoiler!'; 
-}">
-<div id="show_spoil" style="margin: 0px; border-style: solid; border-width: 1px; padding: 4px; width: 98%;">
-<br>
+	
+### STEP 2-a: Dumping JUMPER
+
 Injected and... <br>
 GNames WORKED!<br>
 GObjects blank <img src="https://www.unknowncheats.me/forum/images/smilies/sad.gif" border="0" alt="" title="Frown" class="inlineimg"> <br>
@@ -909,31 +746,10 @@ Uff... 2 things may be wrong: <br>
 - the offsets -duh<br>
 - I need to change something inside the code to match my UE version structure<br>
 <br>
-I'll start studying the logger code.<br>
-</div>
-<div id="hide_spoil" style="display: none;">
-</div>
-</div>
-</div><br>
-<br>
-<b>STEP 2-b: Dumping JUMPER - Why GObjects do not works? - Update 11/01</b><br>
-<br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">
-<input type="button" value="Hide Spoiler!" style="width:100px;font-size:14px;font-bold:true;margin:10px;padding:0px;" onclick="if (this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display != '') 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = ''; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = 'none'; 
-this.value = 'Hide Spoiler!'; 
-} 
-else 
-{ 
-this.parentNode.parentNode.getElementsByTagName('div')['show_spoil'].style.display = 'none'; 
-this.parentNode.parentNode.getElementsByTagName('div')['hide_spoil'].style.display = ''; 
-this.value = 'Show Spoiler!'; 
-}">
-<div id="show_spoil" style="margin: 0px; border-style: solid; border-width: 1px; padding: 4px; width: 98%;">
-<br>
+I'll start studying the logger code.
+
+### STEP 2-b: Dumping JUMPER - Why GObjects do not works? - Update 11/01
+
 So... my post is up from a few days now, and no one has yet answered <img src="https://www.unknowncheats.me/forum/images/smilies/cussing.gif" border="0" alt="" title="Cussing" class="inlineimg"><br>
 What? You don't like me? Well, I will do it on my own <img src="https://www.unknowncheats.me/forum/images/smilies/fing26.gif" border="0" alt="" title="Fing26" class="inlineimg"><br>
 <br>
@@ -1672,42 +1488,28 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 }
 ```
 
-BUILD TIME!<br>
-<br>
+BUILD TIME!
+
 and...<br>
-<br>
 <img src="https://www.unknowncheats.me/forum/images/smilies/cool.gif" border="0" alt="" title="Cool" class="inlineimg"> IT WORKS <img src="https://www.unknowncheats.me/forum/images/smilies/cool.gif" border="0" alt="" title="Cool" class="inlineimg"><br>
-<br>
 
 ![Alt 26-png](https://raw.githubusercontent.com/untyper/UE4.1x_Journey/main/img/26.jpg)
 
-<br>
-Wow I wasn't expect it, uhm ok.<br>
-<br>
+Wow I wasn't expect it, uhm ok.
+
 So now from what I understand I have to make an SDK. And there is a Generator from KN4CK3R out there.<br>
-More code-study time!<br>
-</div>
-<div id="hide_spoil" style="display: none;">
-</div>
-</div>
-</div><br>
-<br>
-</blockquote></div>
-<div id="hide_spoil">
-</div>
-</div>
-</div><br>
-<br>
-<b>QUESTIONS</b><br>
-<br>
-- [Read end of 1.b and start of 1.c for more info] Why in the function I picked to find GetNames() (sub_1401BD5C0, FName::InitInternal_FindOrAddNameEntry()) i wasn't able to find it? I was expecting to find a sub_xxxx (GetNames()) and inside it find the offset of the array I needed. But instead I've found directly the offset in FindOrAddNameEntry(). Little bad of course, but why?<br>
-<br>
-- [Read section SIGS &amp;&amp; PDB in 1.c for more info] What instruction interest to me when I want to grab the sigs for GNames or GObjects? I'm taking offsets to the arrays in IDA, but when i have to do with sigs I don't understand what I need to look.<br>
-<br>
-- Of course if you want to give me advices or correct anything I had said wrong, and there are probably a lot of things , I will be very pleased.<br>
-<br>
-<br>
------------------------------------------------------------------------------------------------------<br>
+More code-study time!
+
+### QUESTIONS
+
+- [Read end of 1.b and start of 1.c for more info] Why in the function I picked to find GetNames() (sub_1401BD5C0, FName::InitInternal_FindOrAddNameEntry()) i wasn't able to find it? I was expecting to find a sub_xxxx (GetNames()) and inside it find the offset of the array I needed. But instead I've found directly the offset in FindOrAddNameEntry(). Little bad of course, but why?
+
+- [Read section SIGS &amp;&amp; PDB in 1.c for more info] What instruction interest to me when I want to grab the sigs for GNames or GObjects? I'm taking offsets to the arrays in IDA, but when i have to do with sigs I don't understand what I need to look.
+
+- Of course if you want to give me advices or correct anything I had said wrong, and there are probably a lot of things , I will be very pleased.
+
+-----------------------------------------------------------------------------------------------------
+
 Hope to have not violated any of the rules, I want of course to update this journey as I go forward, everytime I will make a step, I will update the post.<br>
 <br>
 Thanks for the reading, <br>
