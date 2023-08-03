@@ -1,6 +1,4 @@
-# UE4.1x_Journey
-
-# UE4.1x_Journey
+# UE4.1x Noob Reversing Journey
 
 <div id="post_message_3030862"><b>INTRODUCTION</b><br>
 <br>
@@ -384,31 +382,88 @@ There is nothing to say here, if you want to know how to use it just watch his v
 <br>
 <b>IDA &amp;&amp; SOURCE</b><br>
 <br>
-Source, UObjectHash.cpp:<br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 98px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="typ">FUObjectArray</span><span class="pun">&amp;</span><span class="pln"> </span><span class="typ">GetUObjectArray</span><span class="pun">()</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">	</span><span class="kwd">static</span><span class="pln"> </span><span class="typ">FUObjectArray</span><span class="pln"> </span><span class="typ">GlobalUObjectArray</span><span class="pun">;</span></li><li class="L3"><span class="pln">	</span><span class="kwd">return</span><span class="pln"> </span><span class="typ">GlobalUObjectArray</span><span class="pun">;</span></li><li class="L4"><span class="pun">}</span></li></ol></pre>
-</div>
+Source, UObjectHash.cpp:
+<br>
+	
+```c++
+FUObjectArray& GetUObjectArray()
+{
+	static FUObjectArray GlobalUObjectArray;
+	return GlobalUObjectArray;
+}
+ ```
+
 Find ref, find literals, you know how it works, I'm using "Object not found" from UGameViewportClient::HandleDisplayAllCommand().<br>
 <br>
 4 results, we can do this.<br>
 <br>
 The first has something weird:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 338px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="pln">            v12 </span><span class="pun">=</span><span class="pln"> v16</span><span class="pun">;</span></li><li class="L1"><span class="pln">          sub_1401AA950</span><span class="pun">(</span><span class="pln">a3</span><span class="pun">,</span><span class="pln"> L</span><span class="str">"Property '%s' not found on object '%s'"</span><span class="pun">,</span><span class="pln"> v19</span><span class="pun">,</span><span class="pln"> v12</span><span class="pun">);</span></li><li class="L2"><span class="pln">          </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> v16 </span><span class="pun">)</span></li><li class="L3"><span class="pln">            sub_140157CF0</span><span class="pun">(</span><span class="pln">v16</span><span class="pun">);</span></li><li class="L4"><span class="pln">        </span><span class="pun">}</span></li><li class="L5"><span class="pln">        </span><span class="kwd">else</span></li><li class="L6"><span class="pln">        </span><span class="pun">{</span></li><li class="L7"><span class="pln">          v10 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span><span class="pln">__int64 </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">64</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">32i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">int</span><span class="pun">)</span><span class="pln">sub_140D47260</span><span class="pun">(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">64</span><span class="pun">,</span><span class="pln"> </span><span class="lit">1i64</span><span class="pun">));</span></li><li class="L8"><span class="pln">          </span><span class="pun">*</span><span class="pln">v10 </span><span class="pun">=</span><span class="pln"> v8</span><span class="pun">;</span></li><li class="L9"><span class="pln">          v10</span><span class="pun">[</span><span class="lit">2</span><span class="pun">]</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> v14</span><span class="pun">;</span></li><li class="L0"><span class="pln">        </span><span class="pun">}</span></li><li class="L1"><span class="pln">      </span><span class="pun">}</span></li><li class="L2"><span class="pln">      </span><span class="kwd">else</span></li><li class="L3"><span class="pln">      </span><span class="pun">{</span></li><li class="L4"><span class="pln">        sub_1401AA950</span><span class="pun">(</span><span class="pln">a3</span><span class="pun">,</span><span class="pln"> L</span><span class="str">"Object not found"</span><span class="pun">);</span></li><li class="L5"><span class="pln">      </span><span class="pun">}</span></li><li class="L6"><span class="pln">    </span><span class="pun">}</span></li><li class="L7"><span class="pln">  </span><span class="pun">}</span></li><li class="L8"><span class="pln">  </span><span class="kwd">return</span><span class="pln"> </span><span class="lit">1</span><span class="pun">;</span></li><li class="L9"><span class="pun">}</span></li></ol></pre>
-</div>
+
+```c++
+
+            v12 = v16;
+          sub_1401AA950(a3, L"Property '%s' not found on object '%s'", v19, v12);
+          if ( v16 )
+            sub_140157CF0(v16);
+        }
+        else
+        {
+          v10 = (__int64 *)(*(_QWORD *)(a1 + 64) + 32i64 * (int)sub_140D47260(a1 + 64, 1i64));
+          *v10 = v8;
+          v10[2] = v14;
+        }
+      }
+      else
+      {
+        sub_1401AA950(a3, L"Object not found");
+      }
+    }
+  }
+  return 1;
+}
+```
+
 There isn't any "Property '%s' not found on object '%s'" in my function. Let' search this in source.<br>
 <br>
 Found just one result! If there is also here the GetUObjectArray() we can use this!<br>
 <br>
 Source:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 498px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">bool</span><span class="pln"> </span><span class="typ">UGameViewportClient</span><span class="pun">::</span><span class="typ">HandleDisplayCommand</span><span class="pun">(</span><span class="pln"> </span><span class="kwd">const</span><span class="pln"> TCHAR</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Cmd</span><span class="pun">,</span><span class="pln"> </span><span class="typ">FOutputDevice</span><span class="pun">&amp;</span><span class="pln"> </span><span class="typ">Ar</span><span class="pln"> </span><span class="pun">)</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">	TCHAR </span><span class="typ">ObjectName</span><span class="pun">[</span><span class="lit">256</span><span class="pun">];</span></li><li class="L3"><span class="pln">	TCHAR </span><span class="typ">PropStr</span><span class="pun">[</span><span class="lit">256</span><span class="pun">];</span></li><li class="L4"><span class="pln">	</span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="typ">FParse</span><span class="pun">::</span><span class="typ">Token</span><span class="pun">(</span><span class="typ">Cmd</span><span class="pun">,</span><span class="pln"> </span><span class="typ">ObjectName</span><span class="pun">,</span><span class="pln"> ARRAY_COUNT</span><span class="pun">(</span><span class="typ">ObjectName</span><span class="pun">),</span><span class="pln"> </span><span class="kwd">true</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&amp;&amp;</span></li><li class="L5"><span class="pln">		</span><span class="typ">FParse</span><span class="pun">::</span><span class="typ">Token</span><span class="pun">(</span><span class="typ">Cmd</span><span class="pun">,</span><span class="pln"> </span><span class="typ">PropStr</span><span class="pun">,</span><span class="pln"> ARRAY_COUNT</span><span class="pun">(</span><span class="typ">PropStr</span><span class="pun">),</span><span class="pln"> </span><span class="kwd">true</span><span class="pun">)</span><span class="pln"> </span><span class="pun">)</span></li><li class="L6"><span class="pln">	</span><span class="pun">{</span></li><li class="L7"><span class="pln">		</span><span class="typ">UObject</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Obj</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">FindObject</span><span class="pun">&lt;</span><span class="typ">UObject</span><span class="pun">&gt;(</span><span class="pln">ANY_PACKAGE</span><span class="pun">,</span><span class="pln"> </span><span class="typ">ObjectName</span><span class="pun">);</span></li><li class="L8"><span class="pln">		</span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="typ">Obj</span><span class="pln"> </span><span class="pun">!=</span><span class="pln"> NULL</span><span class="pun">)</span></li><li class="L9"><span class="pln">		</span><span class="pun">{</span></li><li class="L0"><span class="pln">			</span><span class="typ">FName</span><span class="pln"> </span><span class="typ">PropertyName</span><span class="pun">(</span><span class="typ">PropStr</span><span class="pun">,</span><span class="pln"> FNAME_Find</span><span class="pun">);</span></li><li class="L1"><span class="pln">			</span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="typ">PropertyName</span><span class="pln"> </span><span class="pun">!=</span><span class="pln"> NAME_None </span><span class="pun">&amp;&amp;</span><span class="pln"> </span><span class="typ">FindField</span><span class="pun">&lt;</span><span class="typ">UProperty</span><span class="pun">&gt;(</span><span class="typ">Obj</span><span class="pun">-&gt;</span><span class="typ">GetClass</span><span class="pun">(),</span><span class="pln"> </span><span class="typ">PropertyName</span><span class="pun">)</span><span class="pln"> </span><span class="pun">!=</span><span class="pln"> NULL</span><span class="pun">)</span></li><li class="L2"><span class="pln">			</span><span class="pun">{</span></li><li class="L3"><span class="pln">				</span><span class="typ">FDebugDisplayProperty</span><span class="pun">&amp;</span><span class="pln"> </span><span class="typ">NewProp</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">DebugProperties</span><span class="pun">[</span><span class="typ">DebugProperties</span><span class="pun">.</span><span class="typ">AddZeroed</span><span class="pun">()];</span></li><li class="L4"><span class="pln">				</span><span class="typ">NewProp</span><span class="pun">.</span><span class="typ">Obj</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">Obj</span><span class="pun">;</span></li><li class="L5"><span class="pln">				</span><span class="typ">NewProp</span><span class="pun">.</span><span class="typ">PropertyName</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">PropertyName</span><span class="pun">;</span></li><li class="L6"><span class="pln">			</span><span class="pun">}</span></li><li class="L7"><span class="pln">			</span><span class="kwd">else</span></li><li class="L8"><span class="pln">			</span><span class="pun">{</span></li><li class="L9"><span class="pln">				</span><span class="typ">Ar</span><span class="pun">.</span><span class="typ">Logf</span><span class="pun">(</span><span class="pln">TEXT</span><span class="pun">(</span><span class="str">"Property '%s' not found on object '%s'"</span><span class="pun">),</span><span class="pln"> </span><span class="typ">PropStr</span><span class="pun">,</span><span class="pln"> </span><span class="pun">*</span><span class="typ">Obj</span><span class="pun">-&gt;</span><span class="typ">GetName</span><span class="pun">());</span></li><li class="L0"><span class="pln">			</span><span class="pun">}</span></li><li class="L1"><span class="pln">		</span><span class="pun">}</span></li><li class="L2"><span class="pln">		</span><span class="kwd">else</span></li><li class="L3"><span class="pln">		</span><span class="pun">{</span></li><li class="L4"><span class="pln">			</span><span class="typ">Ar</span><span class="pun">.</span><span class="typ">Logf</span><span class="pun">(</span><span class="pln">TEXT</span><span class="pun">(</span><span class="str">"Object not found"</span><span class="pun">));</span></li><li class="L5"><span class="pln">		</span><span class="pun">}</span></li><li class="L6"><span class="pln">	</span><span class="pun">}</span></li><li class="L7"><span class="pln">&nbsp;</span></li><li class="L8"><span class="pln">	</span><span class="kwd">return</span><span class="pln"> </span><span class="kwd">true</span><span class="pun">;</span></li><li class="L9"><span class="pun">}</span></li></ol></pre>
-</div>
+
+```c++
+bool UGameViewportClient::HandleDisplayCommand( const TCHAR* Cmd, FOutputDevice& Ar )
+{
+	TCHAR ObjectName[256];
+	TCHAR PropStr[256];
+	if ( FParse::Token(Cmd, ObjectName, ARRAY_COUNT(ObjectName), true) &&
+		FParse::Token(Cmd, PropStr, ARRAY_COUNT(PropStr), true) )
+	{
+		UObject* Obj = FindObject<UObject>(ANY_PACKAGE, ObjectName);
+		if (Obj != NULL)
+		{
+			FName PropertyName(PropStr, FNAME_Find);
+			if (PropertyName != NAME_None && FindField<UProperty>(Obj->GetClass(), PropertyName) != NULL)
+			{
+				FDebugDisplayProperty& NewProp = DebugProperties[DebugProperties.AddZeroed()];
+				NewProp.Obj = Obj;
+				NewProp.PropertyName = PropertyName;
+			}
+			else
+			{
+				Ar.Logf(TEXT("Property '%s' not found on object '%s'"), PropStr, *Obj->GetName());
+			}
+		}
+		else
+		{
+			Ar.Logf(TEXT("Object not found"));
+		}
+	}
+ 
+	return true;
+}
+```
+
 Nope <img src="https://www.unknowncheats.me/forum/images/smilies/sad.gif" border="0" alt="" title="Frown" class="inlineimg"> Let's try the others. <br>
 Fastforward: All 3 that remains could be my function.<br>
 <br>
@@ -431,29 +486,332 @@ They are identical so I don't care, let's take HandleDisplayAllLocationCommand()
 <br>
 Source:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 498px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">bool</span><span class="pln"> </span><span class="typ">UGameViewportClient</span><span class="pun">::</span><span class="typ">HandleDisplayAllLocationCommand</span><span class="pun">(</span><span class="pln"> </span><span class="kwd">const</span><span class="pln"> TCHAR</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Cmd</span><span class="pun">,</span><span class="pln"> </span><span class="typ">FOutputDevice</span><span class="pun">&amp;</span><span class="pln"> </span><span class="typ">Ar</span><span class="pln"> </span><span class="pun">)</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">	TCHAR </span><span class="typ">ClassName</span><span class="pun">[</span><span class="lit">256</span><span class="pun">];</span></li><li class="L3"><span class="pln">	</span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="typ">FParse</span><span class="pun">::</span><span class="typ">Token</span><span class="pun">(</span><span class="typ">Cmd</span><span class="pun">,</span><span class="pln"> </span><span class="typ">ClassName</span><span class="pun">,</span><span class="pln"> ARRAY_COUNT</span><span class="pun">(</span><span class="typ">ClassName</span><span class="pun">),</span><span class="pln"> </span><span class="kwd">true</span><span class="pun">))</span></li><li class="L4"><span class="pln">	</span><span class="pun">{</span></li><li class="L5"><span class="pln">		</span><span class="typ">UClass</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Cls</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">FindObject</span><span class="pun">&lt;</span><span class="typ">UClass</span><span class="pun">&gt;(</span><span class="pln">ANY_PACKAGE</span><span class="pun">,</span><span class="pln"> </span><span class="typ">ClassName</span><span class="pun">);</span></li><li class="L6"><span class="pln">		</span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="typ">Cls</span><span class="pln"> </span><span class="pun">!=</span><span class="pln"> NULL</span><span class="pun">)</span></li><li class="L7"><span class="pln">		</span><span class="pun">{</span></li><li class="L8"><span class="pln">			</span><span class="com">// add all un-GCable things immediately as that list is static</span></li><li class="L9"><span class="pln">			</span><span class="com">// so then we only have to iterate over dynamic things each frame</span></li><li class="L0"><span class="pln">			</span><span class="kwd">for</span><span class="pln"> </span><span class="pun">(</span><span class="typ">TObjectIterator</span><span class="pun">&lt;</span><span class="typ">UObject</span><span class="pun">&gt;</span><span class="pln"> </span><span class="typ">It</span><span class="pun">(</span><span class="kwd">true</span><span class="pun">);</span><span class="pln"> </span><span class="typ">It</span><span class="pun">;</span><span class="pln"> </span><span class="pun">++</span><span class="typ">It</span><span class="pun">)</span></li><li class="L1"><span class="pln">			</span><span class="pun">{</span></li><li class="L2"><span class="pln">				</span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(!</span><span class="typ">GetUObjectArray</span><span class="pun">().</span><span class="typ">IsDisregardForGC</span><span class="pun">(*</span><span class="typ">It</span><span class="pun">))</span></li><li class="L3"><span class="pln">				</span><span class="pun">{</span></li><li class="L4"><span class="pln">					</span><span class="kwd">break</span><span class="pun">;</span></li><li class="L5"><span class="pln">				</span><span class="pun">}</span></li><li class="L6"><span class="pln">				</span><span class="kwd">else</span><span class="pln"> </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="typ">It</span><span class="pun">-&gt;</span><span class="typ">IsA</span><span class="pun">(</span><span class="typ">Cls</span><span class="pun">))</span></li><li class="L7"><span class="pln">				</span><span class="pun">{</span></li><li class="L8"><span class="pln">					</span><span class="typ">FDebugDisplayProperty</span><span class="pun">&amp;</span><span class="pln"> </span><span class="typ">NewProp</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">DebugProperties</span><span class="pun">[</span><span class="typ">DebugProperties</span><span class="pun">.</span><span class="typ">AddZeroed</span><span class="pun">()];</span></li><li class="L9"><span class="pln">					</span><span class="typ">NewProp</span><span class="pun">.</span><span class="typ">Obj</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*</span><span class="typ">It</span><span class="pun">;</span></li><li class="L0"><span class="pln">					</span><span class="typ">NewProp</span><span class="pun">.</span><span class="typ">PropertyName</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> NAME_Location</span><span class="pun">;</span></li><li class="L1"><span class="pln">					</span><span class="typ">NewProp</span><span class="pun">.</span><span class="pln">bSpecialProperty </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">true</span><span class="pun">;</span></li><li class="L2"><span class="pln">				</span><span class="pun">}</span></li><li class="L3"><span class="pln">			</span><span class="pun">}</span></li><li class="L4"><span class="pln">			</span><span class="typ">FDebugDisplayProperty</span><span class="pun">&amp;</span><span class="pln"> </span><span class="typ">NewProp</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">DebugProperties</span><span class="pun">[</span><span class="typ">DebugProperties</span><span class="pun">.</span><span class="typ">AddZeroed</span><span class="pun">()];</span></li><li class="L5"><span class="pln">			</span><span class="typ">NewProp</span><span class="pun">.</span><span class="typ">Obj</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">Cls</span><span class="pun">;</span></li><li class="L6"><span class="pln">			</span><span class="typ">NewProp</span><span class="pun">.</span><span class="typ">PropertyName</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> NAME_Location</span><span class="pun">;</span></li><li class="L7"><span class="pln">			</span><span class="typ">NewProp</span><span class="pun">.</span><span class="pln">bSpecialProperty </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">true</span><span class="pun">;</span></li><li class="L8"><span class="pln">		</span><span class="pun">}</span></li><li class="L9"><span class="pln">		</span><span class="kwd">else</span></li><li class="L0"><span class="pln">		</span><span class="pun">{</span></li><li class="L1"><span class="pln">			</span><span class="typ">Ar</span><span class="pun">.</span><span class="typ">Logf</span><span class="pun">(</span><span class="pln">TEXT</span><span class="pun">(</span><span class="str">"Object not found"</span><span class="pun">));</span></li><li class="L2"><span class="pln">		</span><span class="pun">}</span></li><li class="L3"><span class="pln">	</span><span class="pun">}</span></li><li class="L4"><span class="pln">&nbsp;</span></li><li class="L5"><span class="pln">	</span><span class="kwd">return</span><span class="pln"> </span><span class="kwd">true</span><span class="pun">;</span></li><li class="L6"><span class="pun">}</span></li></ol></pre>
-</div>
+
+```c++
+bool UGameViewportClient::HandleDisplayAllLocationCommand( const TCHAR* Cmd, FOutputDevice& Ar )
+{
+	TCHAR ClassName[256];
+	if (FParse::Token(Cmd, ClassName, ARRAY_COUNT(ClassName), true))
+	{
+		UClass* Cls = FindObject<UClass>(ANY_PACKAGE, ClassName);
+		if (Cls != NULL)
+		{
+			// add all un-GCable things immediately as that list is static
+			// so then we only have to iterate over dynamic things each frame
+			for (TObjectIterator<UObject> It(true); It; ++It)
+			{
+				if (!GetUObjectArray().IsDisregardForGC(*It))
+				{
+					break;
+				}
+				else if (It->IsA(Cls))
+				{
+					FDebugDisplayProperty& NewProp = DebugProperties[DebugProperties.AddZeroed()];
+					NewProp.Obj = *It;
+					NewProp.PropertyName = NAME_Location;
+					NewProp.bSpecialProperty = true;
+				}
+			}
+			FDebugDisplayProperty& NewProp = DebugProperties[DebugProperties.AddZeroed()];
+			NewProp.Obj = Cls;
+			NewProp.PropertyName = NAME_Location;
+			NewProp.bSpecialProperty = true;
+		}
+		else
+		{
+			Ar.Logf(TEXT("Object not found"));
+		}
+	}
+ 
+	return true;
+}
+```
+
 IDA:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 498px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">char</span><span class="pln"> __fastcall sub_140C661A0</span><span class="pun">(</span><span class="pln">__int64 a1</span><span class="pun">,</span><span class="pln"> __int64 a2</span><span class="pun">,</span><span class="pln"> __int64 a3</span><span class="pun">,</span><span class="pln"> __int64 a4</span><span class="pun">)</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">  __int64 v6</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rax</span></li><li class="L3"><span class="pln">  __int64 v7</span><span class="pun">;</span><span class="pln"> </span><span class="com">// r12</span></li><li class="L4"><span class="pln">  __int64 v8</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rax</span></li><li class="L5"><span class="pln">  __int64 v9</span><span class="pun">;</span><span class="pln"> </span><span class="com">// r8</span></li><li class="L6"><span class="pln">  __int64 v10</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rsi</span></li><li class="L7"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v11</span><span class="pun">;</span><span class="pln"> </span><span class="com">// er15</span></li><li class="L8"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v12</span><span class="pun">;</span><span class="pln"> </span><span class="com">// edi</span></li><li class="L9"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v13</span><span class="pun">;</span><span class="pln"> </span><span class="com">// ebp</span></li><li class="L0"><span class="pln">  __int64 v14</span><span class="pun">;</span><span class="pln"> </span><span class="com">// r14</span></li><li class="L1"><span class="pln">  __int64 v15</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rbx</span></li><li class="L2"><span class="pln">  __int64 v16</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rdx</span></li><li class="L3"><span class="pln">  __int64 v17</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rcx</span></li><li class="L4"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v18</span><span class="pun">;</span><span class="pln"> </span><span class="com">// edx</span></li><li class="L5"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v19</span><span class="pun">;</span><span class="pln"> </span><span class="com">// eax</span></li><li class="L6"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v20</span><span class="pun">;</span><span class="pln"> </span><span class="com">// ecx</span></li><li class="L7"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v21</span><span class="pun">;</span><span class="pln"> </span><span class="com">// eax</span></li><li class="L8"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v22</span><span class="pun">;</span><span class="pln"> </span><span class="com">// ecx</span></li><li class="L9"><span class="pln">  __int64 v23</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rbx</span></li><li class="L0"><span class="pln">  __int64 v24</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rdx</span></li><li class="L1"><span class="pln">  __int64 v25</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rcx</span></li><li class="L2"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v26</span><span class="pun">;</span><span class="pln"> </span><span class="com">// eax</span></li><li class="L3"><span class="pln">  __int64 v27</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rcx</span></li><li class="L4"><span class="pln">  __int64 v28</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rax</span></li><li class="L5"><span class="pln">  __int64 v29</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rcx</span></li><li class="L6"><span class="pln">  __int64 v30</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rcx</span></li><li class="L7"><span class="pln">  __int64 v32</span><span class="pun">;</span><span class="pln"> </span><span class="com">// [rsp+28h] [rbp-270h] BYREF</span></li><li class="L8"><span class="pln">  __int64 v33</span><span class="pun">;</span><span class="pln"> </span><span class="com">// [rsp+30h] [rbp-268h] BYREF</span></li><li class="L9"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v34</span><span class="pun">;</span><span class="pln"> </span><span class="com">// [rsp+38h] [rbp-260h]</span></li><li class="L0"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v35</span><span class="pun">;</span><span class="pln"> </span><span class="com">// [rsp+48h] [rbp-250h]</span></li><li class="L1"><span class="pln">  </span><span class="kwd">char</span><span class="pln"> v36</span><span class="pun">[</span><span class="lit">512</span><span class="pun">];</span><span class="pln"> </span><span class="com">// [rsp+50h] [rbp-248h] BYREF</span></li><li class="L2"><span class="pln">&nbsp;</span></li><li class="L3"><span class="pln">  v32 </span><span class="pun">=</span><span class="pln"> a2</span><span class="pun">;</span></li><li class="L4"><span class="pln">  LOBYTE</span><span class="pun">(</span><span class="pln">a4</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">1</span><span class="pun">;</span></li><li class="L5"><span class="pln">  </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">unsigned</span><span class="pln"> __int8</span><span class="pun">)</span><span class="pln">sub_1401B70C0</span><span class="pun">(&amp;</span><span class="pln">v32</span><span class="pun">,</span><span class="pln"> v36</span><span class="pun">,</span><span class="pln"> </span><span class="lit">256i64</span><span class="pun">,</span><span class="pln"> a4</span><span class="pun">)</span><span class="pln"> </span><span class="pun">)</span></li><li class="L6"><span class="pln">  </span><span class="pun">{</span></li><li class="L7"><span class="pln">    v6 </span><span class="pun">=</span><span class="pln"> sub_14020CB90</span><span class="pun">(</span><span class="pln">L</span><span class="str">"/Script/CoreUObject"</span><span class="pun">);</span></li><li class="L8"><span class="pln">    v7 </span><span class="pun">=</span><span class="pln"> sub_1402766C0</span><span class="pun">(</span><span class="pln">v6</span><span class="pun">,</span><span class="pln"> </span><span class="pun">-</span><span class="lit">1i64</span><span class="pun">,</span><span class="pln"> v36</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0i64</span><span class="pun">);</span></li><li class="L9"><span class="pln">    </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> v7 </span><span class="pun">)</span></li><li class="L0"><span class="pln">    </span><span class="pun">{</span></li><li class="L1"><span class="pln">      v8 </span><span class="pun">=</span><span class="pln"> sub_14027A6E0</span><span class="pun">(</span><span class="pln">L</span><span class="str">"/Script/CoreUObject"</span><span class="pun">);</span></li><li class="L2"><span class="pln">      LOBYTE</span><span class="pun">(</span><span class="pln">v9</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">1</span><span class="pun">;</span></li><li class="L3"><span class="pln">      sub_1401FEFE0</span><span class="pun">(&amp;</span><span class="pln">v33</span><span class="pun">,</span><span class="pln"> v8</span><span class="pun">,</span><span class="pln"> v9</span><span class="pun">,</span><span class="pln"> </span><span class="lit">16i64</span><span class="pun">);</span></li><li class="L4"><span class="pln">      v10 </span><span class="pun">=</span><span class="pln"> v33</span><span class="pun">;</span></li><li class="L5"><span class="pln">      v11 </span><span class="pun">=</span><span class="pln"> v35</span><span class="pun">;</span></li><li class="L6"><span class="pln">      v12 </span><span class="pun">=</span><span class="pln"> v34</span><span class="pun">;</span></li><li class="L7"><span class="pln">LABEL_4</span><span class="pun">:</span></li><li class="L8"><span class="pln">      </span><span class="kwd">while</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> v12 </span><span class="pun">&lt;</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">v10 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">4112</span><span class="pun">)</span><span class="pln"> </span><span class="pun">)</span></li><li class="L9"><span class="pln">      </span><span class="pun">{</span></li><li class="L0"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> v12 </span><span class="pun">&lt;</span><span class="pln"> </span><span class="lit">0</span><span class="pln"> </span><span class="pun">)</span></li><li class="L1"><span class="pln">          </span><span class="kwd">break</span><span class="pun">;</span></li><li class="L2"><span class="pln">        v13 </span><span class="pun">=</span><span class="pln"> v12 </span><span class="pun">/</span><span class="pln"> </span><span class="lit">0x4000</span><span class="pun">;</span></li><li class="L3"><span class="pln">        v14 </span><span class="pun">=</span><span class="pln"> v12 </span><span class="pun">%</span><span class="pln"> </span><span class="lit">0x4000</span><span class="pun">;</span></li><li class="L4"><span class="pln">        v15 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v10 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="pun">(</span><span class="pln">v12 </span><span class="pun">/</span><span class="pln"> </span><span class="lit">0x4000</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v14</span><span class="pun">);</span></li><li class="L5"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">v15 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">12</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&gt;</span><span class="pln"> </span><span class="typ">GetUObjectArray</span><span class="pun">()[</span><span class="lit">1</span><span class="pun">]</span><span class="pln"> </span><span class="pun">)</span></li><li class="L6"><span class="pln">          </span><span class="kwd">break</span><span class="pun">;</span></li><li class="L7"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">unsigned</span><span class="pln"> </span><span class="kwd">int</span><span class="pun">)(*(</span><span class="pln">_DWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v10 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v13 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v14</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16i64</span><span class="pun">)</span></li><li class="L8"><span class="pln">                                      </span><span class="pun">+</span><span class="pln"> </span><span class="lit">136i64</span><span class="pun">)</span></li><li class="L9"><span class="pln">                          </span><span class="pun">-</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">v7 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">136</span><span class="pun">))</span><span class="pln"> </span><span class="pun">&lt;=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">v7 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">140</span><span class="pun">)</span><span class="pln"> </span><span class="pun">)</span></li><li class="L0"><span class="pln">        </span><span class="pun">{</span></li><li class="L1"><span class="pln">          v16 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">64</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">32i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">int</span><span class="pun">)</span><span class="pln">sub_140D47260</span><span class="pun">(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">64</span><span class="pun">,</span><span class="pln"> </span><span class="lit">1i64</span><span class="pun">);</span></li><li class="L2"><span class="pln">          v17 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v10 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v13 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v14</span><span class="pun">);</span></li><li class="L3"><span class="pln">          </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">v16 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">24</span><span class="pun">)</span><span class="pln"> </span><span class="pun">|=</span><span class="pln"> </span><span class="lit">1u</span><span class="pun">;</span></li><li class="L4"><span class="pln">          </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v16 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">249i64</span><span class="pun">;</span></li><li class="L5"><span class="pln">          </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)</span><span class="pln">v16 </span><span class="pun">=</span><span class="pln"> v17</span><span class="pun">;</span></li><li class="L6"><span class="pln">        </span><span class="pun">}</span></li><li class="L7"><span class="pln">        v18 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">v10 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">4112</span><span class="pun">);</span></li><li class="L8"><span class="pln">        </span><span class="kwd">do</span></li><li class="L9"><span class="pln">        </span><span class="pun">{</span></li><li class="L0"><span class="pln">          </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">++</span><span class="pln">v12 </span><span class="pun">&gt;=</span><span class="pln"> v18 </span><span class="pun">)</span></li><li class="L1"><span class="pln">            </span><span class="kwd">break</span><span class="pun">;</span></li><li class="L2"><span class="pln">          </span><span class="kwd">while</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="lit">1</span><span class="pln"> </span><span class="pun">)</span></li><li class="L3"><span class="pln">          </span><span class="pun">{</span></li><li class="L4"><span class="pln">            v19 </span><span class="pun">=</span><span class="pln"> v12</span><span class="pun">;</span></li><li class="L5"><span class="pln">            v20 </span><span class="pun">=</span><span class="pln"> v12 </span><span class="pun">&amp;</span><span class="pln"> </span><span class="lit">0x3FFF</span><span class="pun">;</span></li><li class="L6"><span class="pln">            </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> v12 </span><span class="pun">&lt;</span><span class="pln"> </span><span class="lit">0</span><span class="pln"> </span><span class="pun">)</span></li><li class="L7"><span class="pln">            </span><span class="pun">{</span></li><li class="L8"><span class="pln">              v19 </span><span class="pun">=</span><span class="pln"> v12 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">0x3FFF</span><span class="pun">;</span></li><li class="L9"><span class="pln">              v20 </span><span class="pun">-=</span><span class="pln"> </span><span class="lit">0x4000</span><span class="pun">;</span></li><li class="L0"><span class="pln">            </span><span class="pun">}</span></li><li class="L1"><span class="pln">            </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v10 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="pun">(</span><span class="pln">v19 </span><span class="pun">&gt;&gt;</span><span class="pln"> </span><span class="lit">14</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v20</span><span class="pun">)</span><span class="pln"> </span><span class="pun">)</span></li><li class="L2"><span class="pln">              </span><span class="kwd">break</span><span class="pun">;</span></li><li class="L3"><span class="pln">            </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">++</span><span class="pln">v12 </span><span class="pun">&gt;=</span><span class="pln"> v18 </span><span class="pun">)</span></li><li class="L4"><span class="pln">              </span><span class="kwd">goto</span><span class="pln"> LABEL_4</span><span class="pun">;</span></li><li class="L5"><span class="pln">          </span><span class="pun">}</span></li><li class="L6"><span class="pln">          v21 </span><span class="pun">=</span><span class="pln"> v12</span><span class="pun">;</span></li><li class="L7"><span class="pln">          v22 </span><span class="pun">=</span><span class="pln"> v12 </span><span class="pun">&amp;</span><span class="pln"> </span><span class="lit">0x3FFF</span><span class="pun">;</span></li><li class="L8"><span class="pln">          </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> v12 </span><span class="pun">&lt;</span><span class="pln"> </span><span class="lit">0</span><span class="pln"> </span><span class="pun">)</span></li><li class="L9"><span class="pln">          </span><span class="pun">{</span></li><li class="L0"><span class="pln">            v21 </span><span class="pun">=</span><span class="pln"> v12 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">0x3FFF</span><span class="pun">;</span></li><li class="L1"><span class="pln">            v22 </span><span class="pun">-=</span><span class="pln"> </span><span class="lit">0x4000</span><span class="pun">;</span></li><li class="L2"><span class="pln">          </span><span class="pun">}</span></li><li class="L3"><span class="pln">        </span><span class="pun">}</span></li><li class="L4"><span class="pln">        </span><span class="kwd">while</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">(</span><span class="pln">v11 </span><span class="pun">&amp;</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v10 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="pun">(</span><span class="pln">v21 </span><span class="pun">&gt;&gt;</span><span class="pln"> </span><span class="lit">14</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v22</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pun">))</span><span class="pln"> </span><span class="pun">!=</span><span class="pln"> </span><span class="lit">0</span><span class="pln"> </span><span class="pun">);</span></li><li class="L5"><span class="pln">      </span><span class="pun">}</span></li><li class="L6"><span class="pln">      v23 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="kwd">int</span><span class="pln"> </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">72</span><span class="pun">);</span></li><li class="L7"><span class="pln">      v24 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="kwd">unsigned</span><span class="pln"> </span><span class="kwd">int</span><span class="pln"> </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">76</span><span class="pun">);</span></li><li class="L8"><span class="pln">      v25 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">unsigned</span><span class="pln"> </span><span class="kwd">int</span><span class="pun">)(</span><span class="pln">v23 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">1</span><span class="pun">);</span></li><li class="L9"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">72</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> v25</span><span class="pun">;</span></li><li class="L0"><span class="pln">      </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">int</span><span class="pun">)</span><span class="pln">v25 </span><span class="pun">&gt;</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">int</span><span class="pun">)</span><span class="pln">v24 </span><span class="pun">)</span></li><li class="L1"><span class="pln">      </span><span class="pun">{</span></li><li class="L2"><span class="pln">        v26 </span><span class="pun">=</span><span class="pln"> sub_14011BA90</span><span class="pun">(</span><span class="pln">v25</span><span class="pun">,</span><span class="pln"> v24</span><span class="pun">,</span><span class="pln"> </span><span class="lit">32i64</span><span class="pun">);</span></li><li class="L3"><span class="pln">        </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">76</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> v26</span><span class="pun">;</span></li><li class="L4"><span class="pln">        v27 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">64</span><span class="pun">);</span></li><li class="L5"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> v27 </span><span class="pun">||</span><span class="pln"> v26 </span><span class="pun">)</span></li><li class="L6"><span class="pln">          </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">64</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> sub_140165C50</span><span class="pun">(</span><span class="pln">v27</span><span class="pun">,</span><span class="pln"> </span><span class="lit">32i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v26</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0i64</span><span class="pun">);</span></li><li class="L7"><span class="pln">      </span><span class="pun">}</span></li><li class="L8"><span class="pln">      v28 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">64</span><span class="pun">);</span></li><li class="L9"><span class="pln">      v29 </span><span class="pun">=</span><span class="pln"> </span><span class="lit">32</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v23</span><span class="pun">;</span></li><li class="L0"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v29 </span><span class="pun">+</span><span class="pln"> v28</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0i64</span><span class="pun">;</span></li><li class="L1"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v29 </span><span class="pun">+</span><span class="pln"> v28 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0i64</span><span class="pun">;</span></li><li class="L2"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v29 </span><span class="pun">+</span><span class="pln"> v28 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0i64</span><span class="pun">;</span></li><li class="L3"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v29 </span><span class="pun">+</span><span class="pln"> v28 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">24</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0i64</span><span class="pun">;</span></li><li class="L4"><span class="pln">      v30 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">64</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">32</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v23</span><span class="pun">;</span></li><li class="L5"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">v30 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">24</span><span class="pun">)</span><span class="pln"> </span><span class="pun">|=</span><span class="pln"> </span><span class="lit">1u</span><span class="pun">;</span></li><li class="L6"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)</span><span class="pln">v30 </span><span class="pun">=</span><span class="pln"> v7</span><span class="pun">;</span></li><li class="L7"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v30 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">249i64</span><span class="pun">;</span></li><li class="L8"><span class="pln">    </span><span class="pun">}</span></li><li class="L9"><span class="pln">    </span><span class="kwd">else</span></li><li class="L0"><span class="pln">    </span><span class="pun">{</span></li><li class="L1"><span class="pln">      sub_1401AA950</span><span class="pun">(</span><span class="pln">a3</span><span class="pun">,</span><span class="pln"> L</span><span class="str">"Object not found"</span><span class="pun">);</span></li><li class="L2"><span class="pln">    </span><span class="pun">}</span></li><li class="L3"><span class="pln">  </span><span class="pun">}</span></li><li class="L4"><span class="pln">  </span><span class="kwd">return</span><span class="pln"> </span><span class="lit">1</span><span class="pun">;</span></li><li class="L5"><span class="pun">}</span></li></ol></pre>
-</div>
+
+```c++
+char __fastcall sub_140C661A0(__int64 a1, __int64 a2, __int64 a3, __int64 a4)
+{
+  __int64 v6; // rax
+  __int64 v7; // r12
+  __int64 v8; // rax
+  __int64 v9; // r8
+  __int64 v10; // rsi
+  int v11; // er15
+  int v12; // edi
+  int v13; // ebp
+  __int64 v14; // r14
+  __int64 v15; // rbx
+  __int64 v16; // rdx
+  __int64 v17; // rcx
+  int v18; // edx
+  int v19; // eax
+  int v20; // ecx
+  int v21; // eax
+  int v22; // ecx
+  __int64 v23; // rbx
+  __int64 v24; // rdx
+  __int64 v25; // rcx
+  int v26; // eax
+  __int64 v27; // rcx
+  __int64 v28; // rax
+  __int64 v29; // rcx
+  __int64 v30; // rcx
+  __int64 v32; // [rsp+28h] [rbp-270h] BYREF
+  __int64 v33; // [rsp+30h] [rbp-268h] BYREF
+  int v34; // [rsp+38h] [rbp-260h]
+  int v35; // [rsp+48h] [rbp-250h]
+  char v36[512]; // [rsp+50h] [rbp-248h] BYREF
+ 
+  v32 = a2;
+  LOBYTE(a4) = 1;
+  if ( (unsigned __int8)sub_1401B70C0(&v32, v36, 256i64, a4) )
+  {
+    v6 = sub_14020CB90(L"/Script/CoreUObject");
+    v7 = sub_1402766C0(v6, -1i64, v36, 0i64);
+    if ( v7 )
+    {
+      v8 = sub_14027A6E0(L"/Script/CoreUObject");
+      LOBYTE(v9) = 1;
+      sub_1401FEFE0(&v33, v8, v9, 16i64);
+      v10 = v33;
+      v11 = v35;
+      v12 = v34;
+LABEL_4:
+      while ( v12 < *(_DWORD *)(v10 + 4112) )
+      {
+        if ( v12 < 0 )
+          break;
+        v13 = v12 / 0x4000;
+        v14 = v12 % 0x4000;
+        v15 = *(_QWORD *)(*(_QWORD *)(v10 + 8i64 * (v12 / 0x4000) + 16) + 8 * v14);
+        if ( *(_DWORD *)(v15 + 12) > GetUObjectArray()[1] )
+          break;
+        if ( (unsigned int)(*(_DWORD *)(*(_QWORD *)(*(_QWORD *)(*(_QWORD *)(v10 + 8i64 * v13 + 16) + 8 * v14) + 16i64)
+                                      + 136i64)
+                          - *(_DWORD *)(v7 + 136)) <= *(_DWORD *)(v7 + 140) )
+        {
+          v16 = *(_QWORD *)(a1 + 64) + 32i64 * (int)sub_140D47260(a1 + 64, 1i64);
+          v17 = *(_QWORD *)(*(_QWORD *)(v10 + 8i64 * v13 + 16) + 8 * v14);
+          *(_DWORD *)(v16 + 24) |= 1u;
+          *(_QWORD *)(v16 + 16) = 249i64;
+          *(_QWORD *)v16 = v17;
+        }
+        v18 = *(_DWORD *)(v10 + 4112);
+        do
+        {
+          if ( ++v12 >= v18 )
+            break;
+          while ( 1 )
+          {
+            v19 = v12;
+            v20 = v12 & 0x3FFF;
+            if ( v12 < 0 )
+            {
+              v19 = v12 + 0x3FFF;
+              v20 -= 0x4000;
+            }
+            if ( *(_QWORD *)(*(_QWORD *)(v10 + 8i64 * (v19 >> 14) + 16) + 8i64 * v20) )
+              break;
+            if ( ++v12 >= v18 )
+              goto LABEL_4;
+          }
+          v21 = v12;
+          v22 = v12 & 0x3FFF;
+          if ( v12 < 0 )
+          {
+            v21 = v12 + 0x3FFF;
+            v22 -= 0x4000;
+          }
+        }
+        while ( (v11 & *(_DWORD *)(*(_QWORD *)(*(_QWORD *)(v10 + 8i64 * (v21 >> 14) + 16) + 8i64 * v22) + 8i64)) != 0 );
+      }
+      v23 = *(int *)(a1 + 72);
+      v24 = *(unsigned int *)(a1 + 76);
+      v25 = (unsigned int)(v23 + 1);
+      *(_DWORD *)(a1 + 72) = v25;
+      if ( (int)v25 > (int)v24 )
+      {
+        v26 = sub_14011BA90(v25, v24, 32i64);
+        *(_DWORD *)(a1 + 76) = v26;
+        v27 = *(_QWORD *)(a1 + 64);
+        if ( v27 || v26 )
+          *(_QWORD *)(a1 + 64) = sub_140165C50(v27, 32i64 * v26, 0i64);
+      }
+      v28 = *(_QWORD *)(a1 + 64);
+      v29 = 32 * v23;
+      *(_QWORD *)(v29 + v28) = 0i64;
+      *(_QWORD *)(v29 + v28 + 8) = 0i64;
+      *(_QWORD *)(v29 + v28 + 16) = 0i64;
+      *(_QWORD *)(v29 + v28 + 24) = 0i64;
+      v30 = *(_QWORD *)(a1 + 64) + 32 * v23;
+      *(_DWORD *)(v30 + 24) |= 1u;
+      *(_QWORD *)v30 = v7;
+      *(_QWORD *)(v30 + 16) = 249i64;
+    }
+    else
+    {
+      sub_1401AA950(a3, L"Object not found");
+    }
+  }
+  return 1;
+}
+```
+
 Here I made one mistake initially, I started to analyze the code from the bottom, and there is a while loop that can trick you, leading you to guess that sub_14011BA90 could be GetObjects() and sub_140165C50 AddZeroed(), but once analyzed was pretty obvious they were not.<br>
 Restarted from the top I ended up with these comments:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 498px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">char</span><span class="pln"> __fastcall sub_140C661A0</span><span class="pun">(</span><span class="pln">__int64 a1</span><span class="pun">,</span><span class="pln"> __int64 a2</span><span class="pun">,</span><span class="pln"> __int64 a3</span><span class="pun">,</span><span class="pln"> __int64 a4</span><span class="pun">)</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">  __int64 v6</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rax</span></li><li class="L3"><span class="pln">  __int64 v7</span><span class="pun">;</span><span class="pln"> </span><span class="com">// r12</span></li><li class="L4"><span class="pln">  __int64 v8</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rax</span></li><li class="L5"><span class="pln">  __int64 v9</span><span class="pun">;</span><span class="pln"> </span><span class="com">// r8</span></li><li class="L6"><span class="pln">  __int64 v10</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rsi</span></li><li class="L7"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v11</span><span class="pun">;</span><span class="pln"> </span><span class="com">// er15</span></li><li class="L8"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v12</span><span class="pun">;</span><span class="pln"> </span><span class="com">// edi</span></li><li class="L9"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v13</span><span class="pun">;</span><span class="pln"> </span><span class="com">// ebp</span></li><li class="L0"><span class="pln">  __int64 v14</span><span class="pun">;</span><span class="pln"> </span><span class="com">// r14</span></li><li class="L1"><span class="pln">  __int64 v15</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rbx</span></li><li class="L2"><span class="pln">  __int64 v16</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rdx</span></li><li class="L3"><span class="pln">  __int64 v17</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rcx</span></li><li class="L4"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v18</span><span class="pun">;</span><span class="pln"> </span><span class="com">// edx</span></li><li class="L5"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v19</span><span class="pun">;</span><span class="pln"> </span><span class="com">// eax</span></li><li class="L6"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v20</span><span class="pun">;</span><span class="pln"> </span><span class="com">// ecx</span></li><li class="L7"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v21</span><span class="pun">;</span><span class="pln"> </span><span class="com">// eax</span></li><li class="L8"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v22</span><span class="pun">;</span><span class="pln"> </span><span class="com">// ecx</span></li><li class="L9"><span class="pln">  __int64 v23</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rbx</span></li><li class="L0"><span class="pln">  __int64 v24</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rdx</span></li><li class="L1"><span class="pln">  __int64 v25</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rcx</span></li><li class="L2"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v26</span><span class="pun">;</span><span class="pln"> </span><span class="com">// eax</span></li><li class="L3"><span class="pln">  __int64 v27</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rcx</span></li><li class="L4"><span class="pln">  __int64 v28</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rax</span></li><li class="L5"><span class="pln">  __int64 v29</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rcx</span></li><li class="L6"><span class="pln">  __int64 v30</span><span class="pun">;</span><span class="pln"> </span><span class="com">// rcx</span></li><li class="L7"><span class="pln">  __int64 v32</span><span class="pun">;</span><span class="pln"> </span><span class="com">// [rsp+28h] [rbp-270h] BYREF</span></li><li class="L8"><span class="pln">  __int64 v33</span><span class="pun">;</span><span class="pln"> </span><span class="com">// [rsp+30h] [rbp-268h] BYREF</span></li><li class="L9"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v34</span><span class="pun">;</span><span class="pln"> </span><span class="com">// [rsp+38h] [rbp-260h]</span></li><li class="L0"><span class="pln">  </span><span class="kwd">int</span><span class="pln"> v35</span><span class="pun">;</span><span class="pln"> </span><span class="com">// [rsp+48h] [rbp-250h]</span></li><li class="L1"><span class="pln">  </span><span class="kwd">char</span><span class="pln"> v36</span><span class="pun">[</span><span class="lit">512</span><span class="pun">];</span><span class="pln"> </span><span class="com">// [rsp+50h] [rbp-248h] BYREF</span></li><li class="L2"><span class="pln">&nbsp;</span></li><li class="L3"><span class="pln">  v32 </span><span class="pun">=</span><span class="pln"> a2</span><span class="pun">;</span></li><li class="L4"><span class="pln">  LOBYTE</span><span class="pun">(</span><span class="pln">a4</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">1</span><span class="pun">;</span></li><li class="L5"><span class="pln">  </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">unsigned</span><span class="pln"> __int8</span><span class="pun">)</span><span class="pln">sub_1401B70C0</span><span class="pun">(&amp;</span><span class="pln">v32</span><span class="pun">,</span><span class="pln"> v36</span><span class="pun">,</span><span class="pln"> </span><span class="lit">256i64</span><span class="pun">,</span><span class="pln"> a4</span><span class="pun">)</span><span class="pln"> </span><span class="pun">)</span><span class="com">// if (FParse::Token(Cmd, ClassName, ARRAY_COUNT(ClassName), true))</span></li><li class="L6"><span class="pln">  </span><span class="pun">{</span></li><li class="L7"><span class="pln">    v6 </span><span class="pun">=</span><span class="pln"> sub_14020CB90</span><span class="pun">(</span><span class="pln">L</span><span class="str">"/Script/CoreUObject"</span><span class="pun">);</span><span class="pln"> </span><span class="com">// No idea</span></li><li class="L8"><span class="pln">    v7 </span><span class="pun">=</span><span class="pln"> sub_1402766C0</span><span class="pun">(</span><span class="pln">v6</span><span class="pun">,</span><span class="pln"> </span><span class="pun">-</span><span class="lit">1i64</span><span class="pun">,</span><span class="pln"> v36</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0i64</span><span class="pun">);</span><span class="pln">   </span><span class="com">// FindObject() since it analyzes v7 in the next if</span></li><li class="L9"><span class="pln">    </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> v7 </span><span class="pun">)</span></li><li class="L0"><span class="pln">    </span><span class="pun">{</span></li><li class="L1"><span class="pln">      v8 </span><span class="pun">=</span><span class="pln"> sub_14027A6E0</span><span class="pun">(</span><span class="pln">L</span><span class="str">"/Script/CoreUObject"</span><span class="pun">);</span><span class="com">// No idea</span></li><li class="L2"><span class="pln">      LOBYTE</span><span class="pun">(</span><span class="pln">v9</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">1</span><span class="pun">;</span></li><li class="L3"><span class="pln">      sub_1401FEFE0</span><span class="pun">(&amp;</span><span class="pln">v33</span><span class="pun">,</span><span class="pln"> v8</span><span class="pun">,</span><span class="pln"> v9</span><span class="pun">,</span><span class="pln"> </span><span class="lit">16i64</span><span class="pun">);</span><span class="pln">       </span><span class="com">// FObjectIterator</span></li><li class="L4"><span class="pln">      v10 </span><span class="pun">=</span><span class="pln"> v33</span><span class="pun">;</span></li><li class="L5"><span class="pln">      v11 </span><span class="pun">=</span><span class="pln"> v35</span><span class="pun">;</span></li><li class="L6"><span class="pln">      v12 </span><span class="pun">=</span><span class="pln"> v34</span><span class="pun">;</span></li><li class="L7"><span class="pln">LABEL_4</span><span class="pun">:</span></li><li class="L8"><span class="pln">      </span><span class="kwd">while</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> v12 </span><span class="pun">&lt;</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">v10 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">4112</span><span class="pun">)</span><span class="pln"> </span><span class="pun">)</span><span class="pln">   </span><span class="com">// for loop</span></li><li class="L9"><span class="pln">      </span><span class="pun">{</span></li><li class="L0"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> v12 </span><span class="pun">&lt;</span><span class="pln"> </span><span class="lit">0</span><span class="pln"> </span><span class="pun">)</span></li><li class="L1"><span class="pln">          </span><span class="kwd">break</span><span class="pun">;</span></li><li class="L2"><span class="pln">        v13 </span><span class="pun">=</span><span class="pln"> v12 </span><span class="pun">/</span><span class="pln"> </span><span class="lit">0x4000</span><span class="pun">;</span></li><li class="L3"><span class="pln">        v14 </span><span class="pun">=</span><span class="pln"> v12 </span><span class="pun">%</span><span class="pln"> </span><span class="lit">0x4000</span><span class="pun">;</span></li><li class="L4"><span class="pln">        v15 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v10 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="pun">(</span><span class="pln">v12 </span><span class="pun">/</span><span class="pln"> </span><span class="lit">0x4000</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v14</span><span class="pun">);</span></li><li class="L5"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">v15 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">12</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&gt;</span><span class="pln"> sub_14026F0F0</span><span class="pun">()[</span><span class="lit">1</span><span class="pun">]</span><span class="pln"> </span><span class="pun">)</span><span class="com">// GetUObjectArray()</span></li><li class="L6"><span class="pln">          </span><span class="kwd">break</span><span class="pun">;</span></li><li class="L7"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">unsigned</span><span class="pln"> </span><span class="kwd">int</span><span class="pun">)(*(</span><span class="pln">_DWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v10 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v13 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v14</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16i64</span><span class="pun">)</span></li><li class="L8"><span class="pln">                                      </span><span class="pun">+</span><span class="pln"> </span><span class="lit">136i64</span><span class="pun">)</span></li><li class="L9"><span class="pln">                          </span><span class="pun">-</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">v7 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">136</span><span class="pun">))</span><span class="pln"> </span><span class="pun">&lt;=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">v7 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">140</span><span class="pun">)</span><span class="pln"> </span><span class="pun">)</span></li><li class="L0"><span class="pln">        </span><span class="pun">{</span></li><li class="L1"><span class="pln">          v16 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">64</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">32i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">int</span><span class="pun">)</span><span class="pln">sub_140D47260</span><span class="pun">(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">64</span><span class="pun">,</span><span class="pln"> </span><span class="lit">1i64</span><span class="pun">);</span><span class="com">// AddZeroed()</span></li><li class="L2"><span class="pln">          v17 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v10 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v13 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v14</span><span class="pun">);</span></li><li class="L3"><span class="pln">          </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">v16 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">24</span><span class="pun">)</span><span class="pln"> </span><span class="pun">|=</span><span class="pln"> </span><span class="lit">1u</span><span class="pun">;</span></li><li class="L4"><span class="pln">          </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v16 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">249i64</span><span class="pun">;</span></li><li class="L5"><span class="pln">          </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)</span><span class="pln">v16 </span><span class="pun">=</span><span class="pln"> v17</span><span class="pun">;</span></li><li class="L6"><span class="pln">        </span><span class="pun">}</span></li><li class="L7"><span class="pln">        v18 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">v10 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">4112</span><span class="pun">);</span></li><li class="L8"><span class="pln">        </span><span class="kwd">do</span></li><li class="L9"><span class="pln">        </span><span class="pun">{</span></li><li class="L0"><span class="pln">          </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">++</span><span class="pln">v12 </span><span class="pun">&gt;=</span><span class="pln"> v18 </span><span class="pun">)</span></li><li class="L1"><span class="pln">            </span><span class="kwd">break</span><span class="pun">;</span></li><li class="L2"><span class="pln">          </span><span class="kwd">while</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="lit">1</span><span class="pln"> </span><span class="pun">)</span></li><li class="L3"><span class="pln">          </span><span class="pun">{</span></li><li class="L4"><span class="pln">            v19 </span><span class="pun">=</span><span class="pln"> v12</span><span class="pun">;</span></li><li class="L5"><span class="pln">            v20 </span><span class="pun">=</span><span class="pln"> v12 </span><span class="pun">&amp;</span><span class="pln"> </span><span class="lit">0x3FFF</span><span class="pun">;</span></li><li class="L6"><span class="pln">            </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> v12 </span><span class="pun">&lt;</span><span class="pln"> </span><span class="lit">0</span><span class="pln"> </span><span class="pun">)</span></li><li class="L7"><span class="pln">            </span><span class="pun">{</span></li><li class="L8"><span class="pln">              v19 </span><span class="pun">=</span><span class="pln"> v12 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">0x3FFF</span><span class="pun">;</span></li><li class="L9"><span class="pln">              v20 </span><span class="pun">-=</span><span class="pln"> </span><span class="lit">0x4000</span><span class="pun">;</span></li><li class="L0"><span class="pln">            </span><span class="pun">}</span></li><li class="L1"><span class="pln">            </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v10 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="pun">(</span><span class="pln">v19 </span><span class="pun">&gt;&gt;</span><span class="pln"> </span><span class="lit">14</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v20</span><span class="pun">)</span><span class="pln"> </span><span class="pun">)</span></li><li class="L2"><span class="pln">              </span><span class="kwd">break</span><span class="pun">;</span></li><li class="L3"><span class="pln">            </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">++</span><span class="pln">v12 </span><span class="pun">&gt;=</span><span class="pln"> v18 </span><span class="pun">)</span></li><li class="L4"><span class="pln">              </span><span class="kwd">goto</span><span class="pln"> LABEL_4</span><span class="pun">;</span></li><li class="L5"><span class="pln">          </span><span class="pun">}</span></li><li class="L6"><span class="pln">          v21 </span><span class="pun">=</span><span class="pln"> v12</span><span class="pun">;</span></li><li class="L7"><span class="pln">          v22 </span><span class="pun">=</span><span class="pln"> v12 </span><span class="pun">&amp;</span><span class="pln"> </span><span class="lit">0x3FFF</span><span class="pun">;</span></li><li class="L8"><span class="pln">          </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> v12 </span><span class="pun">&lt;</span><span class="pln"> </span><span class="lit">0</span><span class="pln"> </span><span class="pun">)</span></li><li class="L9"><span class="pln">          </span><span class="pun">{</span></li><li class="L0"><span class="pln">            v21 </span><span class="pun">=</span><span class="pln"> v12 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">0x3FFF</span><span class="pun">;</span></li><li class="L1"><span class="pln">            v22 </span><span class="pun">-=</span><span class="pln"> </span><span class="lit">0x4000</span><span class="pun">;</span></li><li class="L2"><span class="pln">          </span><span class="pun">}</span></li><li class="L3"><span class="pln">        </span><span class="pun">}</span></li><li class="L4"><span class="pln">        </span><span class="kwd">while</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">(</span><span class="pln">v11 </span><span class="pun">&amp;</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v10 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="pun">(</span><span class="pln">v21 </span><span class="pun">&gt;&gt;</span><span class="pln"> </span><span class="lit">14</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v22</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8i64</span><span class="pun">))</span><span class="pln"> </span><span class="pun">!=</span><span class="pln"> </span><span class="lit">0</span><span class="pln"> </span><span class="pun">);</span></li><li class="L5"><span class="pln">      </span><span class="pun">}</span></li><li class="L6"><span class="pln">      v23 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="kwd">int</span><span class="pln"> </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">72</span><span class="pun">);</span></li><li class="L7"><span class="pln">      v24 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="kwd">unsigned</span><span class="pln"> </span><span class="kwd">int</span><span class="pln"> </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">76</span><span class="pun">);</span></li><li class="L8"><span class="pln">      v25 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">unsigned</span><span class="pln"> </span><span class="kwd">int</span><span class="pun">)(</span><span class="pln">v23 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">1</span><span class="pun">);</span></li><li class="L9"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">72</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> v25</span><span class="pun">;</span></li><li class="L0"><span class="pln">      </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">int</span><span class="pun">)</span><span class="pln">v25 </span><span class="pun">&gt;</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">int</span><span class="pun">)</span><span class="pln">v24 </span><span class="pun">)</span></li><li class="L1"><span class="pln">      </span><span class="pun">{</span></li><li class="L2"><span class="pln">        v26 </span><span class="pun">=</span><span class="pln"> sub_14011BA90</span><span class="pun">(</span><span class="pln">v25</span><span class="pun">,</span><span class="pln"> v24</span><span class="pun">,</span><span class="pln"> </span><span class="lit">32i64</span><span class="pun">);</span><span class="pln">   </span><span class="com">// No idea</span></li><li class="L3"><span class="pln">        </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">76</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> v26</span><span class="pun">;</span></li><li class="L4"><span class="pln">        v27 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">64</span><span class="pun">);</span></li><li class="L5"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> v27 </span><span class="pun">||</span><span class="pln"> v26 </span><span class="pun">)</span></li><li class="L6"><span class="pln">          </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">64</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> sub_140165C50</span><span class="pun">(</span><span class="pln">v27</span><span class="pun">,</span><span class="pln"> </span><span class="lit">32i64</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v26</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0i64</span><span class="pun">);</span><span class="com">// NO idea</span></li><li class="L7"><span class="pln">      </span><span class="pun">}</span></li><li class="L8"><span class="pln">      v28 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">64</span><span class="pun">);</span></li><li class="L9"><span class="pln">      v29 </span><span class="pun">=</span><span class="pln"> </span><span class="lit">32</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v23</span><span class="pun">;</span></li><li class="L0"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v29 </span><span class="pun">+</span><span class="pln"> v28</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0i64</span><span class="pun">;</span></li><li class="L1"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v29 </span><span class="pun">+</span><span class="pln"> v28 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">8</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0i64</span><span class="pun">;</span></li><li class="L2"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v29 </span><span class="pun">+</span><span class="pln"> v28 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0i64</span><span class="pun">;</span></li><li class="L3"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v29 </span><span class="pun">+</span><span class="pln"> v28 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">24</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0i64</span><span class="pun">;</span></li><li class="L4"><span class="pln">      v30 </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">a1 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">64</span><span class="pun">)</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="lit">32</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> v23</span><span class="pun">;</span></li><li class="L5"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(</span><span class="pln">v30 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">24</span><span class="pun">)</span><span class="pln"> </span><span class="pun">|=</span><span class="pln"> </span><span class="lit">1u</span><span class="pun">;</span></li><li class="L6"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)</span><span class="pln">v30 </span><span class="pun">=</span><span class="pln"> v7</span><span class="pun">;</span></li><li class="L7"><span class="pln">      </span><span class="pun">*(</span><span class="pln">_QWORD </span><span class="pun">*)(</span><span class="pln">v30 </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16</span><span class="pun">)</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="lit">249i64</span><span class="pun">;</span></li><li class="L8"><span class="pln">    </span><span class="pun">}</span></li><li class="L9"><span class="pln">    </span><span class="kwd">else</span></li><li class="L0"><span class="pln">    </span><span class="pun">{</span></li><li class="L1"><span class="pln">      sub_1401AA950</span><span class="pun">(</span><span class="pln">a3</span><span class="pun">,</span><span class="pln"> L</span><span class="str">"Object not found"</span><span class="pun">);</span><span class="pln">   </span><span class="com">// Log</span></li><li class="L2"><span class="pln">    </span><span class="pun">}</span></li><li class="L3"><span class="pln">  </span><span class="pun">}</span></li><li class="L4"><span class="pln">  </span><span class="kwd">return</span><span class="pln"> </span><span class="lit">1</span><span class="pun">;</span></li><li class="L5"><span class="pun">}</span></li></ol></pre>
-</div>
+
+```c++
+char __fastcall sub_140C661A0(__int64 a1, __int64 a2, __int64 a3, __int64 a4)
+{
+  __int64 v6; // rax
+  __int64 v7; // r12
+  __int64 v8; // rax
+  __int64 v9; // r8
+  __int64 v10; // rsi
+  int v11; // er15
+  int v12; // edi
+  int v13; // ebp
+  __int64 v14; // r14
+  __int64 v15; // rbx
+  __int64 v16; // rdx
+  __int64 v17; // rcx
+  int v18; // edx
+  int v19; // eax
+  int v20; // ecx
+  int v21; // eax
+  int v22; // ecx
+  __int64 v23; // rbx
+  __int64 v24; // rdx
+  __int64 v25; // rcx
+  int v26; // eax
+  __int64 v27; // rcx
+  __int64 v28; // rax
+  __int64 v29; // rcx
+  __int64 v30; // rcx
+  __int64 v32; // [rsp+28h] [rbp-270h] BYREF
+  __int64 v33; // [rsp+30h] [rbp-268h] BYREF
+  int v34; // [rsp+38h] [rbp-260h]
+  int v35; // [rsp+48h] [rbp-250h]
+  char v36[512]; // [rsp+50h] [rbp-248h] BYREF
+ 
+  v32 = a2;
+  LOBYTE(a4) = 1;
+  if ( (unsigned __int8)sub_1401B70C0(&v32, v36, 256i64, a4) )// if (FParse::Token(Cmd, ClassName, ARRAY_COUNT(ClassName), true))
+  {
+    v6 = sub_14020CB90(L"/Script/CoreUObject"); // No idea
+    v7 = sub_1402766C0(v6, -1i64, v36, 0i64);   // FindObject() since it analyzes v7 in the next if
+    if ( v7 )
+    {
+      v8 = sub_14027A6E0(L"/Script/CoreUObject");// No idea
+      LOBYTE(v9) = 1;
+      sub_1401FEFE0(&v33, v8, v9, 16i64);       // FObjectIterator
+      v10 = v33;
+      v11 = v35;
+      v12 = v34;
+LABEL_4:
+      while ( v12 < *(_DWORD *)(v10 + 4112) )   // for loop
+      {
+        if ( v12 < 0 )
+          break;
+        v13 = v12 / 0x4000;
+        v14 = v12 % 0x4000;
+        v15 = *(_QWORD *)(*(_QWORD *)(v10 + 8i64 * (v12 / 0x4000) + 16) + 8 * v14);
+        if ( *(_DWORD *)(v15 + 12) > sub_14026F0F0()[1] )// GetUObjectArray()
+          break;
+        if ( (unsigned int)(*(_DWORD *)(*(_QWORD *)(*(_QWORD *)(*(_QWORD *)(v10 + 8i64 * v13 + 16) + 8 * v14) + 16i64)
+                                      + 136i64)
+                          - *(_DWORD *)(v7 + 136)) <= *(_DWORD *)(v7 + 140) )
+        {
+          v16 = *(_QWORD *)(a1 + 64) + 32i64 * (int)sub_140D47260(a1 + 64, 1i64);// AddZeroed()
+          v17 = *(_QWORD *)(*(_QWORD *)(v10 + 8i64 * v13 + 16) + 8 * v14);
+          *(_DWORD *)(v16 + 24) |= 1u;
+          *(_QWORD *)(v16 + 16) = 249i64;
+          *(_QWORD *)v16 = v17;
+        }
+        v18 = *(_DWORD *)(v10 + 4112);
+        do
+        {
+          if ( ++v12 >= v18 )
+            break;
+          while ( 1 )
+          {
+            v19 = v12;
+            v20 = v12 & 0x3FFF;
+            if ( v12 < 0 )
+            {
+              v19 = v12 + 0x3FFF;
+              v20 -= 0x4000;
+            }
+            if ( *(_QWORD *)(*(_QWORD *)(v10 + 8i64 * (v19 >> 14) + 16) + 8i64 * v20) )
+              break;
+            if ( ++v12 >= v18 )
+              goto LABEL_4;
+          }
+          v21 = v12;
+          v22 = v12 & 0x3FFF;
+          if ( v12 < 0 )
+          {
+            v21 = v12 + 0x3FFF;
+            v22 -= 0x4000;
+          }
+        }
+        while ( (v11 & *(_DWORD *)(*(_QWORD *)(*(_QWORD *)(v10 + 8i64 * (v21 >> 14) + 16) + 8i64 * v22) + 8i64)) != 0 );
+      }
+      v23 = *(int *)(a1 + 72);
+      v24 = *(unsigned int *)(a1 + 76);
+      v25 = (unsigned int)(v23 + 1);
+      *(_DWORD *)(a1 + 72) = v25;
+      if ( (int)v25 > (int)v24 )
+      {
+        v26 = sub_14011BA90(v25, v24, 32i64);   // No idea
+        *(_DWORD *)(a1 + 76) = v26;
+        v27 = *(_QWORD *)(a1 + 64);
+        if ( v27 || v26 )
+          *(_QWORD *)(a1 + 64) = sub_140165C50(v27, 32i64 * v26, 0i64);// NO idea
+      }
+      v28 = *(_QWORD *)(a1 + 64);
+      v29 = 32 * v23;
+      *(_QWORD *)(v29 + v28) = 0i64;
+      *(_QWORD *)(v29 + v28 + 8) = 0i64;
+      *(_QWORD *)(v29 + v28 + 16) = 0i64;
+      *(_QWORD *)(v29 + v28 + 24) = 0i64;
+      v30 = *(_QWORD *)(a1 + 64) + 32 * v23;
+      *(_DWORD *)(v30 + 24) |= 1u;
+      *(_QWORD *)v30 = v7;
+      *(_QWORD *)(v30 + 16) = 249i64;
+    }
+    else
+    {
+      sub_1401AA950(a3, L"Object not found");   // Log
+    }
+  }
+  return 1;
+}
+```
+
 Got into sub_14026F0F0():<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 226px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="pun">*</span><span class="pln">sub_14026F0F0</span><span class="pun">()</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">  </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> dword_1421EEF00 </span><span class="pun">&lt;=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">_DWORD </span><span class="pun">*)(*((</span><span class="pln">_QWORD </span><span class="pun">*)</span><span class="typ">NtCurrentTeb</span><span class="pun">()-&gt;</span><span class="typ">ThreadLocalStoragePointer</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">unsigned</span><span class="pln"> </span><span class="kwd">int</span><span class="pun">)</span><span class="typ">TlsIndex</span><span class="pun">)</span></li><li class="L3"><span class="pln">                                    </span><span class="pun">+</span><span class="pln"> </span><span class="lit">16i64</span><span class="pun">)</span><span class="pln"> </span><span class="pun">)</span></li><li class="L4"><span class="pln">    </span><span class="kwd">return</span><span class="pln"> </span><span class="pun">&amp;</span><span class="pln">dword_1421EDE70</span><span class="pun">;</span></li><li class="L5"><span class="pln">  </span><span class="typ">Init_thread_header</span><span class="pun">(&amp;</span><span class="pln">dword_1421EEF00</span><span class="pun">);</span></li><li class="L6"><span class="pln">  </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln"> dword_1421EEF00 </span><span class="pun">!=</span><span class="pln"> </span><span class="pun">-</span><span class="lit">1</span><span class="pln"> </span><span class="pun">)</span></li><li class="L7"><span class="pln">    </span><span class="kwd">return</span><span class="pln"> </span><span class="pun">&amp;</span><span class="pln">dword_1421EDE70</span><span class="pun">;</span></li><li class="L8"><span class="pln">  sub_140269280</span><span class="pun">(&amp;</span><span class="pln">dword_1421EDE70</span><span class="pun">);</span></li><li class="L9"><span class="pln">  atexit</span><span class="pun">(</span><span class="pln">sub_14193BC40</span><span class="pun">);</span></li><li class="L0"><span class="pln">  </span><span class="typ">Init_thread_footer</span><span class="pun">(&amp;</span><span class="pln">dword_1421EEF00</span><span class="pun">);</span></li><li class="L1"><span class="pln">  </span><span class="kwd">return</span><span class="pln"> </span><span class="pun">&amp;</span><span class="pln">dword_1421EDE70</span><span class="pun">;</span></li><li class="L2"><span class="pun">}</span></li></ol></pre>
-</div>
+
+```c++
+
+*sub_14026F0F0()
+{
+  if ( dword_1421EEF00 <= *(_DWORD *)(*((_QWORD *)NtCurrentTeb()->ThreadLocalStoragePointer + (unsigned int)TlsIndex)
+                                    + 16i64) )
+    return &dword_1421EDE70;
+  Init_thread_header(&dword_1421EEF00);
+  if ( dword_1421EEF00 != -1 )
+    return &dword_1421EDE70;
+  sub_140269280(&dword_1421EDE70);
+  atexit(sub_14193BC40);
+  Init_thread_footer(&dword_1421EEF00);
+  return &dword_1421EDE70;
+}
+```
+
 It's easy to think that our array could be the returned value: dword_1421EDE70, offset being 21EDE70. UFT gave me 21EDE80. We are there but with this offset of 10, weird, i will try both.<br>
 <br>
 <b>SIGS &amp;&amp; PDB</b><br>
@@ -619,31 +977,84 @@ Like I expected GNames is good. And since we are here let's put some types and n
 <br>
 So let's see in the source what we are looking, we start like always from the GetNames() method.<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 178px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="typ">TNameEntryArray</span><span class="pun">&amp;</span><span class="pln"> </span><span class="typ">FName</span><span class="pun">::</span><span class="typ">GetNames</span><span class="pun">()</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">	</span><span class="kwd">static</span><span class="pln"> </span><span class="typ">TNameEntryArray</span><span class="pun">*</span><span class="pln">	</span><span class="typ">Names</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> NULL</span><span class="pun">;</span></li><li class="L3"><span class="pln">	</span><span class="kwd">if</span><span class="pun">(</span><span class="pln"> </span><span class="typ">Names</span><span class="pln"> </span><span class="pun">==</span><span class="pln"> NULL </span><span class="pun">)</span></li><li class="L4"><span class="pln">	</span><span class="pun">{</span></li><li class="L5"><span class="pln">		check</span><span class="pun">(</span><span class="typ">IsInGameThread</span><span class="pun">());</span></li><li class="L6"><span class="pln">		</span><span class="typ">Names</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">new</span><span class="pln"> </span><span class="typ">TNameEntryArray</span><span class="pun">();</span></li><li class="L7"><span class="pln">	</span><span class="pun">}</span></li><li class="L8"><span class="pln">	</span><span class="kwd">return</span><span class="pln"> </span><span class="pun">*</span><span class="typ">Names</span><span class="pun">;</span></li><li class="L9"><span class="pun">}</span></li></ol></pre>
-</div>
+
+```c++
+TNameEntryArray& FName::GetNames()
+{
+	static TNameEntryArray*	Names = NULL;
+	if( Names == NULL )
+	{
+		check(IsInGameThread());
+		Names = new TNameEntryArray();
+	}
+	return *Names;
+}
+```
+
 So GetNames() returns a TNameEntryArray, let'go to his definition:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 34px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">typedef</span><span class="pln"> </span><span class="typ">TStaticIndirectArrayThreadSafeRead</span><span class="pun">&lt;</span><span class="typ">FNameEntry</span><span class="pun">,</span><span class="pln"> </span><span class="lit">2</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="lit">1024</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="lit">1024</span><span class="pln"> </span><span class="com">/* 2M unique FNames */</span><span class="pun">,</span><span class="pln"> </span><span class="lit">16384</span><span class="pln"> </span><span class="com">/* allocated in 64K/128K chunks */</span><span class="pln"> </span><span class="pun">&gt;</span><span class="pln"> </span><span class="typ">TNameEntryArray</span><span class="pun">;</span></li></ol></pre>
-</div>
+
+```c++
+typedef TStaticIndirectArrayThreadSafeRead<FNameEntry, 2 * 1024 * 1024 /* 2M unique FNames */, 16384 /* allocated in 64K/128K chunks */ > TNameEntryArray;
+```
+
 Woo, and what is that? Definition of TStaticIndirectArrayThreadSafeRead:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 354px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="com">/**</span></li><li class="L1"><span class="com"> * Simple array type that can be expanded without invalidating existing entries.</span></li><li class="L2"><span class="com"> * This is critical to thread safe FNames.</span></li><li class="L3"><span class="com"> *    @</span><a href="https://www.unknowncheats.me/forum/members/635998.html" target="_blank"><span class="com">Param</span></a><span class="com"> ElementType Type of the pointer we are storing in the array</span></li><li class="L4"><span class="com"> *    @</span><a href="https://www.unknowncheats.me/forum/members/635998.html" target="_blank"><span class="com">Param</span></a><span class="com"> MaxTotalElements absolute maximum number of elements this array can ever hold</span></li><li class="L5"><span class="com"> *    @</span><a href="https://www.unknowncheats.me/forum/members/635998.html" target="_blank"><span class="com">Param</span></a><span class="com"> ElementsPerChunk how many elements to allocate in a chunk</span></li><li class="L6"><span class="com"> **/</span></li><li class="L7"><span class="pln"> </span><span class="kwd">template</span><span class="pun">&lt;</span><span class="kwd">typename</span><span class="pln"> </span><span class="typ">ElementType</span><span class="pun">,</span><span class="pln"> int32 </span><span class="typ">MaxTotalElements</span><span class="pun">,</span><span class="pln"> int32 </span><span class="typ">ElementsPerChunk</span><span class="pun">&gt;</span></li><li class="L8"><span class="kwd">class</span><span class="pln"> </span><span class="typ">TStaticIndirectArrayThreadSafeRead</span></li><li class="L9"><span class="pun">{</span></li><li class="L0"><span class="pln">	</span><span class="kwd">enum</span></li><li class="L1"><span class="pln">	</span><span class="pun">{</span></li><li class="L2"><span class="pln">		</span><span class="com">// figure out how many elements we need in the master table</span></li><li class="L3"><span class="pln">		</span><span class="typ">ChunkTableSize</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span><span class="typ">MaxTotalElements</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="typ">ElementsPerChunk</span><span class="pln"> </span><span class="pun">-</span><span class="pln"> </span><span class="lit">1</span><span class="pun">)</span><span class="pln"> </span><span class="pun">/</span><span class="pln"> </span><span class="typ">ElementsPerChunk</span></li><li class="L4"><span class="pln">	</span><span class="pun">};</span></li><li class="L5"><span class="pln">	</span><span class="com">/** Static master table to chunks of pointers **/</span></li><li class="L6"><span class="pln">	</span><span class="typ">ElementType</span><span class="pun">**</span><span class="pln"> </span><span class="typ">Chunks</span><span class="pun">[</span><span class="typ">ChunkTableSize</span><span class="pun">];</span></li><li class="L7"><span class="pln">	</span><span class="com">/** Number of elements we currently have **/</span></li><li class="L8"><span class="pln">	int32 </span><span class="typ">NumElements</span><span class="pun">;</span></li><li class="L9"><span class="pln">	</span><span class="com">/** Number of chunks we currently have **/</span></li><li class="L0"><span class="pln">	int32 </span><span class="typ">NumChunks</span><span class="pun">;</span></li></ol></pre>
-</div>
+
+```c++
+/**
+ * Simple array type that can be expanded without invalidating existing entries.
+ * This is critical to thread safe FNames.
+ *    @Param ElementType Type of the pointer we are storing in the array
+ *    @Param MaxTotalElements absolute maximum number of elements this array can ever hold
+ *    @Param ElementsPerChunk how many elements to allocate in a chunk
+ **/
+ template<typename ElementType, int32 MaxTotalElements, int32 ElementsPerChunk>
+class TStaticIndirectArrayThreadSafeRead
+{
+	enum
+	{
+		// figure out how many elements we need in the master table
+		ChunkTableSize = (MaxTotalElements + ElementsPerChunk - 1) / ElementsPerChunk
+	};
+	/** Static master table to chunks of pointers **/
+	ElementType** Chunks[ChunkTableSize];
+	/** Number of elements we currently have **/
+	int32 NumElements;
+	/** Number of chunks we currently have **/
+	int32 NumChunks;
+```
+
 Ok so is basically a standard array, the first parameter is the type of data it's holding and the others parameters define how this array is divided in multiple chunks.<br>
 So going back at the definition of TNameEntryArray: it is an array that contains FNameEntry.<br>
 <br>
 Definition of FNameEntry:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 338px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="com">/**</span></li><li class="L1"><span class="com"> * A global name, as stored in the global name table.</span></li><li class="L2"><span class="com"> */</span></li><li class="L3"><span class="kwd">struct</span><span class="pln"> </span><span class="typ">FNameEntry</span></li><li class="L4"><span class="pun">{</span></li><li class="L5"><span class="kwd">private</span><span class="pun">:</span></li><li class="L6"><span class="pln">	</span><span class="com">/** Index of name in hash. */</span></li><li class="L7"><span class="pln">	NAME_INDEX		</span><span class="typ">Index</span><span class="pun">;</span></li><li class="L8"><span class="pln">&nbsp;</span></li><li class="L9"><span class="kwd">public</span><span class="pun">:</span></li><li class="L0"><span class="pln">	</span><span class="com">/** Pointer to the next entry in this hash bin's linked list. */</span></li><li class="L1"><span class="pln">	</span><span class="typ">FNameEntry</span><span class="pun">*</span><span class="pln">		</span><span class="typ">HashNext</span><span class="pun">;</span></li><li class="L2"><span class="pln">&nbsp;</span></li><li class="L3"><span class="kwd">private</span><span class="pun">:</span></li><li class="L4"><span class="pln">	</span><span class="com">/** Name, variable-sized - note that AllocateNameEntry only allocates memory as needed. */</span></li><li class="L5"><span class="pln">	</span><span class="kwd">union</span></li><li class="L6"><span class="pln">	</span><span class="pun">{</span></li><li class="L7"><span class="pln">		ANSICHAR	</span><span class="typ">AnsiName</span><span class="pun">[</span><span class="pln">NAME_SIZE</span><span class="pun">];</span></li><li class="L8"><span class="pln">		WIDECHAR	</span><span class="typ">WideName</span><span class="pun">[</span><span class="pln">NAME_SIZE</span><span class="pun">];</span></li><li class="L9"><span class="pln">	</span><span class="pun">};</span></li></ol></pre>
-</div>
+
+```c++
+
+/**
+ * A global name, as stored in the global name table.
+ */
+struct FNameEntry
+{
+private:
+	/** Index of name in hash. */
+	NAME_INDEX		Index;
+ 
+public:
+	/** Pointer to the next entry in this hash bin's linked list. */
+	FNameEntry*		HashNext;
+ 
+private:
+	/** Name, variable-sized - note that AllocateNameEntry only allocates memory as needed. */
+	union
+	{
+		ANSICHAR	AnsiName[NAME_SIZE];
+		WIDECHAR	WideName[NAME_SIZE];
+	};
+```
+
 Here we are! So AnsiName is probably our name (None ecc), FNameEntry is a pointer, Index is an int32, but we avance some space if math isn't an opinion. The name was at offset 0x10 so there is probably some extra space between HashNext and the name. <br>
 Let's put all of this in ReClass:<br>
 <br>
@@ -702,34 +1113,71 @@ Now let's look at the source and let's see if we can understand the structure.<b
 <br>
 Start from GetUObjectArray():<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 98px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="typ">FUObjectArray</span><span class="pun">&amp;</span><span class="pln"> </span><span class="typ">GetUObjectArray</span><span class="pun">()</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">	</span><span class="kwd">static</span><span class="pln"> </span><span class="typ">FUObjectArray</span><span class="pln"> </span><span class="typ">GlobalUObjectArray</span><span class="pun">;</span></li><li class="L3"><span class="pln">	</span><span class="kwd">return</span><span class="pln"> </span><span class="typ">GlobalUObjectArray</span><span class="pun">;</span></li><li class="L4"><span class="pun">}</span></li></ol></pre>
-</div>
+
+```c++
+FUObjectArray& GetUObjectArray()
+{
+	static FUObjectArray GlobalUObjectArray;
+	return GlobalUObjectArray;
+}
+```
+
 Returns an FUObjectArray:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 146px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="pln">	</span><span class="com">/** First index into objects array taken into account for GC.							*/</span></li><li class="L1"><span class="pln">	int32 </span><span class="typ">ObjFirstGCIndex</span><span class="pun">;</span></li><li class="L2"><span class="pln">	</span><span class="com">/** Index pointing to last object created in range disregarded for GC.					*/</span></li><li class="L3"><span class="pln">	int32 </span><span class="typ">ObjLastNonGCIndex</span><span class="pun">;</span></li><li class="L4"><span class="pln">	</span><span class="com">/** If true this is the intial load and we should load objects int the disregarded for GC range.	*/</span></li><li class="L5"><span class="pln">	int32 </span><span class="typ">OpenForDisregardForGC</span><span class="pun">;</span></li><li class="L6"><span class="pln">	</span><span class="com">/** Array of all live objects.											*/</span></li><li class="L7"><span class="pln">	</span><span class="typ">TUObjectArray</span><span class="pln"> </span><span class="typ">ObjObjects</span><span class="pun">;</span></li></ol></pre>
-</div>
+
+```c++
+	/** First index into objects array taken into account for GC.							*/
+	int32 ObjFirstGCIndex;
+	/** Index pointing to last object created in range disregarded for GC.					*/
+	int32 ObjLastNonGCIndex;
+	/** If true this is the intial load and we should load objects int the disregarded for GC range.	*/
+	int32 OpenForDisregardForGC;
+	/** Array of all live objects.											*/
+	TUObjectArray ObjObjects;
+```
+
 Ok so another array apparently: TUObjectArray <br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 34px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">typedef</span><span class="pln"> </span><span class="typ">TStaticIndirectArrayThreadSafeRead</span><span class="pun">&lt;</span><span class="typ">UObjectBase</span><span class="pun">,</span><span class="pln"> </span><span class="lit">8</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="lit">1024</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="lit">1024</span><span class="pln"> </span><span class="com">/* Max 8M UObjects */</span><span class="pun">,</span><span class="pln"> </span><span class="lit">16384</span><span class="pln"> </span><span class="com">/* allocated in 64K/128K chunks */</span><span class="pln"> </span><span class="pun">&gt;</span><span class="pln"> </span><span class="typ">TUObjectArray</span><span class="pun">;</span></li></ol></pre>
-</div>
+
+```c++
+typedef TStaticIndirectArrayThreadSafeRead<UObjectBase, 8 * 1024 * 1024 /* Max 8M UObjects */, 16384 /* allocated in 64K/128K chunks */ > TUObjectArray;
+```
+
 Oh, just like the array of the names, remember? This one is made of UObjectBase though:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 258px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="pln">	</span><span class="com">/** Flags used to track and report various object states. This needs to be 8 byte aligned on 32-bit</span></li><li class="L1"><span class="com">	    platforms to reduce memory waste */</span></li><li class="L2"><span class="pln">	</span><span class="typ">EObjectFlags</span><span class="pln">					</span><span class="typ">ObjectFlags</span><span class="pun">;</span></li><li class="L3"><span class="pln">&nbsp;</span></li><li class="L4"><span class="pln">	</span><span class="com">/** Index into GObjectArray...very private. */</span></li><li class="L5"><span class="pln">	int32								</span><span class="typ">InternalIndex</span><span class="pun">;</span></li><li class="L6"><span class="pln">&nbsp;</span></li><li class="L7"><span class="pln">	</span><span class="com">/** Class the object belongs to. */</span></li><li class="L8"><span class="pln">	</span><span class="typ">UClass</span><span class="pun">*</span><span class="pln">							</span><span class="typ">Class</span><span class="pun">;</span></li><li class="L9"><span class="pln">&nbsp;</span></li><li class="L0"><span class="pln">	</span><span class="com">/** Name of this object */</span></li><li class="L1"><span class="pln">	</span><span class="typ">FName</span><span class="pln">							</span><span class="typ">Name</span><span class="pun">;</span></li><li class="L2"><span class="pln">&nbsp;</span></li><li class="L3"><span class="pln">	</span><span class="com">/** Object this object resides in. */</span></li><li class="L4"><span class="pln">	</span><span class="typ">UObject</span><span class="pun">*</span><span class="pln">						</span><span class="typ">Outer</span><span class="pun">;</span></li></ol></pre>
-</div>
+
+```c++
+	/** Flags used to track and report various object states. This needs to be 8 byte aligned on 32-bit
+	    platforms to reduce memory waste */
+	EObjectFlags					ObjectFlags;
+ 
+	/** Index into GObjectArray...very private. */
+	int32								InternalIndex;
+ 
+	/** Class the object belongs to. */
+	UClass*							Class;
+ 
+	/** Name of this object */
+	FName							Name;
+ 
+	/** Object this object resides in. */
+	UObject*						Outer;
+```
+
 Here we are: this should be our UObject, let's take a look at FName:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 146px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="pln">	</span><span class="com">/** Index into the Names array (used to find String portion of the string/number pair used for comparison) */</span></li><li class="L1"><span class="pln">	NAME_INDEX		</span><span class="typ">ComparisonIndex</span><span class="pun">;</span></li><li class="L2"><span class="com">#if WITH_CASE_PRESERVING_NAME</span></li><li class="L3"><span class="pln">	</span><span class="com">/** Index into the Names array (used to find String portion of the string/number pair used for display) */</span></li><li class="L4"><span class="pln">	NAME_INDEX		</span><span class="typ">DisplayIndex</span><span class="pun">;</span></li><li class="L5"><span class="com">#endif</span></li><li class="L6"><span class="pln">	</span><span class="com">/** Number portion of the string/number pair (stored internally as 1 more than actual, so zero'd memory will be the default, no-instance case) */</span></li><li class="L7"><span class="pln">	uint32			</span><span class="typ">Number</span><span class="pun">;</span></li></ol></pre>
-</div>
+
+```c++
+	/** Index into the Names array (used to find String portion of the string/number pair used for comparison) */
+	NAME_INDEX		ComparisonIndex;
+#if WITH_CASE_PRESERVING_NAME
+	/** Index into the Names array (used to find String portion of the string/number pair used for display) */
+	NAME_INDEX		DisplayIndex;
+#endif
+	/** Number portion of the string/number pair (stored internally as 1 more than actual, so zero'd memory will be the default, no-instance case) */
+	uint32			Number;
+```
+
 Ok so basically FName has an index (int32). This integer refer to the GName array, and here's why we need both.<br>
 For every object we take, we see that index, search that index in the Name array and we have the name of the object!<br>
 All clear, let's try to put that in ReClass and if matches:<br>
@@ -759,16 +1207,47 @@ First things firts, if you have compiling problem add #include &lt;Psapi.h&gt;, 
 <br>
 I'd like to go by order so let'start from DllMain:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 258px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="pln">BOOL WINAPI </span><span class="typ">DllMain</span><span class="pun">(</span><span class="pln">HMODULE hModule</span><span class="pun">,</span><span class="pln"> DWORD dwReason</span><span class="pun">,</span><span class="pln"> LPVOID lpReserved</span><span class="pun">)</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">    </span><span class="kwd">switch</span><span class="pln"> </span><span class="pun">(</span><span class="pln">dwReason</span><span class="pun">)</span></li><li class="L3"><span class="pln">    </span><span class="pun">{</span></li><li class="L4"><span class="pln">    </span><span class="kwd">case</span><span class="pln"> DLL_PROCESS_ATTACH</span><span class="pun">:</span></li><li class="L5"><span class="pln">        </span><span class="typ">DisableThreadLibraryCalls</span><span class="pun">(</span><span class="pln">hModule</span><span class="pun">);</span></li><li class="L6"><span class="pln">        </span><span class="typ">CreateThread</span><span class="pun">(</span><span class="pln">NULL</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0</span><span class="pun">,</span><span class="pln"> </span><span class="pun">(</span><span class="pln">LPTHREAD_START_ROUTINE</span><span class="pun">)</span><span class="pln">onAttach</span><span class="pun">,</span><span class="pln"> NULL</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0</span><span class="pun">,</span><span class="pln"> NULL</span><span class="pun">);</span></li><li class="L7"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> </span><span class="kwd">true</span><span class="pun">;</span></li><li class="L8"><span class="pln">        </span><span class="kwd">break</span><span class="pun">;</span></li><li class="L9"><span class="pln">&nbsp;</span></li><li class="L0"><span class="pln">    </span><span class="kwd">case</span><span class="pln"> DLL_PROCESS_DETACH</span><span class="pun">:</span></li><li class="L1"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> </span><span class="kwd">true</span><span class="pun">;</span></li><li class="L2"><span class="pln">        </span><span class="kwd">break</span><span class="pun">;</span></li><li class="L3"><span class="pln">    </span><span class="pun">}</span></li><li class="L4"><span class="pun">}</span></li></ol></pre>
-</div>
+
+```c++
+BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
+{
+    switch (dwReason)
+    {
+    case DLL_PROCESS_ATTACH:
+        DisableThreadLibraryCalls(hModule);
+        CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)onAttach, NULL, 0, NULL);
+        return true;
+        break;
+ 
+    case DLL_PROCESS_DETACH:
+        return true;
+        break;
+    }
+}
+```
+
 Very basic, let's see onAttach() then:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 274px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">void</span><span class="pln"> onAttach</span><span class="pun">()</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">    </span><span class="typ">AllocConsole</span><span class="pun">();</span></li><li class="L3"><span class="pln">    freopen</span><span class="pun">(</span><span class="str">"CONOUT$"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"w"</span><span class="pun">,</span><span class="pln"> stdout</span><span class="pun">);</span></li><li class="L4"><span class="pln">&nbsp;</span></li><li class="L5"><span class="pln">    MODULEINFO miGame </span><span class="pun">=</span><span class="pln"> </span><span class="typ">GetModuleInfo</span><span class="pun">(</span><span class="pln">NULL</span><span class="pun">);</span></li><li class="L6"><span class="pln">&nbsp;</span></li><li class="L7"><span class="pln">    </span><span class="typ">GObjObjects_offset</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span><span class="pln">DWORD64</span><span class="pun">)((</span><span class="pln">DWORD64</span><span class="pun">)</span><span class="pln">miGame</span><span class="pun">.</span><span class="pln">lpBaseOfDll </span><span class="pun">+</span><span class="pln"> </span><span class="lit">0x21EDE80</span><span class="pun">);</span></li><li class="L8"><span class="pln">    </span><span class="typ">Names_offset</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(*(</span><span class="pln">DWORD64</span><span class="pun">*)((</span><span class="pln">DWORD64</span><span class="pun">)</span><span class="pln">miGame</span><span class="pun">.</span><span class="pln">lpBaseOfDll </span><span class="pun">+</span><span class="pln"> </span><span class="lit">0x21DD6B8</span><span class="pun">));</span></li><li class="L9"><span class="pln">&nbsp;</span></li><li class="L0"><span class="pln">    </span><span class="typ">GObjObjects</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span><span class="typ">FUObjectArray</span><span class="pun">*)</span><span class="typ">GObjObjects_offset</span><span class="pun">;</span></li><li class="L1"><span class="pln">    </span><span class="typ">Names</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span><span class="typ">TNameEntryArray</span><span class="pun">*)</span><span class="typ">Names_offset</span><span class="pun">;</span></li><li class="L2"><span class="pln">&nbsp;</span></li><li class="L3"><span class="pln">    </span><span class="typ">NameDump</span><span class="pun">();</span></li><li class="L4"><span class="pln">    </span><span class="typ">ObjectDump</span><span class="pun">();</span></li><li class="L5"><span class="pun">}</span></li></ol></pre>
-</div>
+
+```c++
+void onAttach()
+{
+    AllocConsole();
+    freopen("CONOUT$", "w", stdout);
+ 
+    MODULEINFO miGame = GetModuleInfo(NULL);
+ 
+    GObjObjects_offset = (DWORD64)((DWORD64)miGame.lpBaseOfDll + 0x21EDE80);
+    Names_offset = (*(DWORD64*)((DWORD64)miGame.lpBaseOfDll + 0x21DD6B8));
+ 
+    GObjObjects = (FUObjectArray*)GObjObjects_offset;
+    Names = (TNameEntryArray*)Names_offset;
+ 
+    NameDump();
+    ObjectDump();
+}
+```
+
 Ok, now Names works, so let' see what it's doing, it takes the offset and it dereference it so the program wants the pointer to the first chunk, this one for understand:<br>
 <br>
 
@@ -777,107 +1256,422 @@ Ok, now Names works, so let' see what it's doing, it takes the offset and it der
 <br>
 Well the GObject offset we are giving points already to the same location but for the objects so no need to dereference: <br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 50px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="pln">    </span><span class="typ">GObjObjects_offset</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">((</span><span class="pln">DWORD64</span><span class="pun">)</span><span class="pln">miGame</span><span class="pun">.</span><span class="pln">lpBaseOfDll </span><span class="pun">+</span><span class="pln"> </span><span class="lit">0x21EDE80</span><span class="pun">);</span></li><li class="L1"><span class="pln">    </span><span class="typ">Names_offset</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(*(</span><span class="pln">DWORD64</span><span class="pun">*)((</span><span class="pln">DWORD64</span><span class="pun">)</span><span class="pln">miGame</span><span class="pun">.</span><span class="pln">lpBaseOfDll </span><span class="pun">+</span><span class="pln"> </span><span class="lit">0x21DD6B8</span><span class="pun">));</span></li></ol></pre>
-</div>
+
+```c++
+    GObjObjects_offset = ((DWORD64)miGame.lpBaseOfDll + 0x21EDE80);
+    Names_offset = (*(DWORD64*)((DWORD64)miGame.lpBaseOfDll + 0x21DD6B8));
+```
+
 Then next couple of lines, Names is good, GObjObjects no... don't need FUObjectArray, let's fix it:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 50px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="pln">    </span><span class="typ">GObjObjects</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span><span class="typ">TUObjectArray</span><span class="pun">*)</span><span class="typ">GObjObjects_offset</span><span class="pun">;</span></li><li class="L1"><span class="pln">    </span><span class="typ">Names</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span><span class="typ">TNameEntryArray</span><span class="pun">*)</span><span class="typ">Names_offset</span><span class="pun">;</span></li></ol></pre>
-</div>
+
+```c++
+    GObjObjects = (TUObjectArray*)GObjObjects_offset;
+    Names = (TNameEntryArray*)Names_offset;
+```
+
 Now the definitions:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 34px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">using</span><span class="pln"> </span><span class="typ">TNameEntryArray</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">TStaticIndirectArrayThreadSafeRead</span><span class="pun">&lt;</span><span class="typ">FNameEntry</span><span class="pun">,</span><span class="pln"> </span><span class="lit">2</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="lit">1024</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="lit">1024</span><span class="pun">,</span><span class="pln"> </span><span class="lit">16384</span><span class="pun">&gt;;</span></li></ol></pre>
-</div>
+
+```c++
+using TNameEntryArray = TStaticIndirectArrayThreadSafeRead<FNameEntry, 2 * 1024 * 1024, 16384>;
+```
+
 Oh just like the source, FNameEntry and TStaticIndirectArrayThreadSafeRead:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 130px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">struct</span><span class="pln"> </span><span class="typ">FNameEntry</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">    </span><span class="kwd">int</span><span class="pln"> </span><span class="typ">Index</span><span class="pun">;</span></li><li class="L3"><span class="pln">    </span><span class="kwd">char</span><span class="pln"> pad_0x0004</span><span class="pun">[</span><span class="lit">0x4</span><span class="pun">];</span></li><li class="L4"><span class="pln">    </span><span class="typ">FNameEntry</span><span class="pun">*</span><span class="pln"> </span><span class="typ">HashNext</span><span class="pun">;</span></li><li class="L5"><span class="pln">    </span><span class="kwd">char</span><span class="pln"> </span><span class="typ">AnsiName</span><span class="pun">[</span><span class="lit">1024</span><span class="pun">];</span></li><li class="L6"><span class="pun">};</span></li></ol></pre>
-</div>
+
+```c++
+struct FNameEntry
+{
+    int Index;
+    char pad_0x0004[0x4];
+    FNameEntry* HashNext;
+    char AnsiName[1024];
+};
+```
+
 See the padding, I'm not a complete idiot come on.<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 498px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">template</span><span class="pun">&lt;</span><span class="kwd">typename</span><span class="pln"> </span><span class="typ">ElementType</span><span class="pun">,</span><span class="pln"> __int32 </span><span class="typ">MaxTotalElements</span><span class="pun">,</span><span class="pln"> __int32 </span><span class="typ">ElementsPerChunk</span><span class="pun">&gt;</span></li><li class="L1"><span class="kwd">class</span><span class="pln"> </span><span class="typ">TStaticIndirectArrayThreadSafeRead</span></li><li class="L2"><span class="pun">{</span></li><li class="L3"><span class="kwd">public</span><span class="pun">:</span></li><li class="L4"><span class="pln">    __int32 </span><span class="typ">Num</span><span class="pun">()</span><span class="pln"> </span><span class="kwd">const</span></li><li class="L5"><span class="pln">    </span><span class="pun">{</span></li><li class="L6"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> numElements</span><span class="pun">;</span></li><li class="L7"><span class="pln">    </span><span class="pun">}</span></li><li class="L8"><span class="pln">&nbsp;</span></li><li class="L9"><span class="pln">    </span><span class="kwd">bool</span><span class="pln"> </span><span class="typ">IsValidIndex</span><span class="pun">(</span><span class="pln">__int32 index</span><span class="pun">)</span><span class="pln"> </span><span class="kwd">const</span></li><li class="L0"><span class="pln">    </span><span class="pun">{</span></li><li class="L1"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> index </span><span class="pun">&gt;=</span><span class="pln"> </span><span class="lit">0</span><span class="pln"> </span><span class="pun">&amp;&amp;</span><span class="pln"> index </span><span class="pun">&lt;</span><span class="pln"> </span><span class="typ">Num</span><span class="pun">()</span><span class="pln"> </span><span class="pun">&amp;&amp;</span><span class="pln"> </span><span class="typ">GetById</span><span class="pun">(</span><span class="pln">index</span><span class="pun">)</span><span class="pln"> </span><span class="pun">!=</span><span class="pln"> </span><span class="kwd">nullptr</span><span class="pun">;</span></li><li class="L2"><span class="pln">    </span><span class="pun">}</span></li><li class="L3"><span class="pln">&nbsp;</span></li><li class="L4"><span class="pln">    </span><span class="typ">ElementType</span><span class="pln"> </span><span class="kwd">const</span><span class="pun">*</span><span class="pln"> </span><span class="kwd">const</span><span class="pun">&amp;</span><span class="pln"> </span><span class="typ">GetById</span><span class="pun">(</span><span class="pln">__int32 index</span><span class="pun">)</span><span class="pln"> </span><span class="kwd">const</span></li><li class="L5"><span class="pln">    </span><span class="pun">{</span></li><li class="L6"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> </span><span class="pun">*</span><span class="typ">GetItemPtr</span><span class="pun">(</span><span class="pln">index</span><span class="pun">);</span></li><li class="L7"><span class="pln">    </span><span class="pun">}</span></li><li class="L8"><span class="pln">&nbsp;</span></li><li class="L9"><span class="kwd">private</span><span class="pun">:</span></li><li class="L0"><span class="pln">    </span><span class="typ">ElementType</span><span class="pln"> </span><span class="kwd">const</span><span class="pun">*</span><span class="pln"> </span><span class="kwd">const</span><span class="pun">*</span><span class="pln"> </span><span class="typ">GetItemPtr</span><span class="pun">(</span><span class="pln">__int32 </span><span class="typ">Index</span><span class="pun">)</span><span class="pln"> </span><span class="kwd">const</span></li><li class="L1"><span class="pln">    </span><span class="pun">{</span></li><li class="L2"><span class="pln">        </span><span class="kwd">const</span><span class="pln"> __int32 </span><span class="typ">ChunkIndex</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">Index</span><span class="pln"> </span><span class="pun">/</span><span class="pln"> </span><span class="typ">ElementsPerChunk</span><span class="pun">;</span></li><li class="L3"><span class="pln">        </span><span class="kwd">const</span><span class="pln"> __int32 </span><span class="typ">WithinChunkIndex</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">Index</span><span class="pln"> </span><span class="pun">%</span><span class="pln"> </span><span class="typ">ElementsPerChunk</span><span class="pun">;</span></li><li class="L4"><span class="pln">        </span><span class="kwd">const</span><span class="pln"> </span><span class="kwd">auto</span><span class="pln"> </span><span class="typ">Chunk</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> chunks</span><span class="pun">[</span><span class="typ">ChunkIndex</span><span class="pun">];</span></li><li class="L5"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> </span><span class="typ">Chunk</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="typ">WithinChunkIndex</span><span class="pun">;</span></li><li class="L6"><span class="pln">    </span><span class="pun">}</span></li><li class="L7"><span class="pln">&nbsp;</span></li><li class="L8"><span class="pln">    </span><span class="kwd">enum</span></li><li class="L9"><span class="pln">    </span><span class="pun">{</span></li><li class="L0"><span class="pln">        </span><span class="typ">ChunkTableSize</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span><span class="typ">MaxTotalElements</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="typ">ElementsPerChunk</span><span class="pln"> </span><span class="pun">-</span><span class="pln"> </span><span class="lit">1</span><span class="pun">)</span><span class="pln"> </span><span class="pun">/</span><span class="pln"> </span><span class="typ">ElementsPerChunk</span></li><li class="L1"><span class="pln">    </span><span class="pun">};</span></li><li class="L2"><span class="pln">&nbsp;</span></li><li class="L3"><span class="pln">    </span><span class="typ">ElementType</span><span class="pun">**</span><span class="pln"> chunks</span><span class="pun">[</span><span class="typ">ChunkTableSize</span><span class="pun">];</span></li><li class="L4"><span class="pln">    __int32 numElements</span><span class="pun">;</span></li><li class="L5"><span class="pln">    __int32 numChunks</span><span class="pun">;</span></li><li class="L6"><span class="pun">};</span></li></ol></pre>
-</div>
+
+```c++
+template<typename ElementType, __int32 MaxTotalElements, __int32 ElementsPerChunk>
+class TStaticIndirectArrayThreadSafeRead
+{
+public:
+    __int32 Num() const
+    {
+        return numElements;
+    }
+ 
+    bool IsValidIndex(__int32 index) const
+    {
+        return index >= 0 && index < Num() && GetById(index) != nullptr;
+    }
+ 
+    ElementType const* const& GetById(__int32 index) const
+    {
+        return *GetItemPtr(index);
+    }
+ 
+private:
+    ElementType const* const* GetItemPtr(__int32 Index) const
+    {
+        const __int32 ChunkIndex = Index / ElementsPerChunk;
+        const __int32 WithinChunkIndex = Index % ElementsPerChunk;
+        const auto Chunk = chunks[ChunkIndex];
+        return Chunk + WithinChunkIndex;
+    }
+ 
+    enum
+    {
+        ChunkTableSize = (MaxTotalElements + ElementsPerChunk - 1) / ElementsPerChunk
+    };
+ 
+    ElementType** chunks[ChunkTableSize];
+    __int32 numElements;
+    __int32 numChunks;
+};
+```
+
 That's f*cking perfect! Need to hug this man, make sense that GNames works.<br>
 Let's see TUObjectArray though:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 130px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">class</span><span class="pln"> </span><span class="typ">TUObjectArray</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="kwd">public</span><span class="pun">:</span></li><li class="L3"><span class="pln">    </span><span class="typ">FUObjectItem</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Objects</span><span class="pun">;</span></li><li class="L4"><span class="pln">    __int32 </span><span class="typ">MaxElements</span><span class="pun">;</span></li><li class="L5"><span class="pln">    __int32 </span><span class="typ">NumElements</span><span class="pun">;</span></li><li class="L6"><span class="pun">};</span></li></ol></pre>
-</div>
+
+```c++
+class TUObjectArray
+{
+public:
+    FUObjectItem* Objects;
+    __int32 MaxElements;
+    __int32 NumElements;
+};
+```
+
 Mmm... nope, that's clearly a different structure, our TObjectArray should be like this, let's edit it:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 34px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">using</span><span class="pln"> </span><span class="typ">TUObjectArray</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">TStaticIndirectArrayThreadSafeRead</span><span class="pun">&lt;</span><span class="typ">UObjectBase</span><span class="pun">,</span><span class="pln"> </span><span class="lit">8</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="lit">1024</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="lit">1024</span><span class="pun">,</span><span class="pln"> </span><span class="lit">16384</span><span class="pun">&gt;;</span></li></ol></pre>
-</div>
+
+```c++
+using TUObjectArray = TStaticIndirectArrayThreadSafeRead<UObjectBase, 8 * 1024 * 1024, 16384>;
+```
+
 Ok let'see if there is UObjectBase in the logger... nope, but there is UObject, should be similar, let's see:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 98px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">struct</span><span class="pln"> </span><span class="typ">UObject</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">    UCHAR   </span><span class="typ">Unknown</span><span class="pun">[</span><span class="lit">0x10</span><span class="pun">];</span><span class="pln">       </span><span class="com">// unknowed data</span></li><li class="L3"><span class="pln">    DWORD   </span><span class="typ">NameIndex</span><span class="pun">;</span><span class="pln">                              </span><span class="com">// struct FName</span></li><li class="L4"><span class="pun">};</span></li></ol></pre>
-</div>
+
+```c++
+struct UObject
+{
+    UCHAR   Unknown[0x10];       // unknowed data
+    DWORD   NameIndex;                              // struct FName
+};
+```
+
 Yeah so apparently it wants only to know where is the index of FName, make sense, in our case so we can change it in:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 98px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">struct</span><span class="pln"> </span><span class="typ">UObjectBase</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">    UCHAR   </span><span class="typ">Unknown</span><span class="pun">[</span><span class="lit">0x18</span><span class="pun">];</span><span class="pln">       </span><span class="com">// unknowed data</span></li><li class="L3"><span class="pln">    DWORD   </span><span class="typ">NameIndex</span><span class="pun">;</span><span class="pln">                              </span><span class="com">// struct FName</span></li><li class="L4"><span class="pun">};</span></li></ol></pre>
-</div>
+
+```c++
+struct UObjectBase
+{
+    UCHAR   Unknown[0x18];       // unknowed data
+    DWORD   NameIndex;                              // struct FName
+};
+```
+
 0x18, go see the ReClass images.<br>
 <br>
 Ok then it calls the Dump methods<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 482px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">void</span><span class="pln"> </span><span class="typ">ObjectDump</span><span class="pun">()</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">    FILE</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Log</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> NULL</span><span class="pun">;</span></li><li class="L3"><span class="pln">    fopen_s</span><span class="pun">(&amp;</span><span class="typ">Log</span><span class="pun">,</span><span class="pln"> </span><span class="str">"ObjectDump.txt"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"w+"</span><span class="pun">);</span></li><li class="L4"><span class="pln">&nbsp;</span></li><li class="L5"><span class="pln">    </span><span class="kwd">for</span><span class="pln"> </span><span class="pun">(</span><span class="pln">DWORD64 i </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0x0</span><span class="pun">;</span><span class="pln"> i </span><span class="pun">&lt;</span><span class="pln"> </span><span class="typ">GObjObjects</span><span class="pun">-&gt;</span><span class="typ">ObjObjects</span><span class="pun">.</span><span class="typ">NumElements</span><span class="pun">;</span><span class="pln"> i</span><span class="pun">++)</span></li><li class="L6"><span class="pln">    </span><span class="pun">{</span></li><li class="L7"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(!</span><span class="typ">GObjObjects</span><span class="pun">-&gt;</span><span class="typ">ObjObjects</span><span class="pun">.</span><span class="typ">Objects</span><span class="pun">[</span><span class="pln">i</span><span class="pun">].</span><span class="typ">Object</span><span class="pun">)</span><span class="pln"> </span><span class="pun">{</span><span class="pln"> </span><span class="kwd">continue</span><span class="pun">;</span><span class="pln"> </span><span class="pun">}</span></li><li class="L8"><span class="pln">&nbsp;</span></li><li class="L9"><span class="pln">        fprintf</span><span class="pun">(</span><span class="typ">Log</span><span class="pun">,</span><span class="pln"> </span><span class="str">"UObject[%06i] %-50s 0x%llX\n"</span><span class="pun">,</span><span class="pln"> i</span><span class="pun">,</span><span class="pln"> </span><span class="typ">GetName</span><span class="pun">(</span><span class="typ">GObjObjects</span><span class="pun">-&gt;</span><span class="typ">ObjObjects</span><span class="pun">.</span><span class="typ">Objects</span><span class="pun">[</span><span class="pln">i</span><span class="pun">].</span><span class="typ">Object</span><span class="pun">),</span><span class="pln"> </span><span class="typ">GObjObjects</span><span class="pun">-&gt;</span><span class="typ">ObjObjects</span><span class="pun">.</span><span class="typ">Objects</span><span class="pun">[</span><span class="pln">i</span><span class="pun">].</span><span class="typ">Object</span><span class="pun">);</span></li><li class="L0"><span class="pln">    </span><span class="pun">}</span></li><li class="L1"><span class="pln">&nbsp;</span></li><li class="L2"><span class="pln">    fclose</span><span class="pun">(</span><span class="typ">Log</span><span class="pun">);</span></li><li class="L3"><span class="pun">}</span></li><li class="L4"><span class="pln">&nbsp;</span></li><li class="L5"><span class="kwd">void</span><span class="pln"> </span><span class="typ">NameDump</span><span class="pun">()</span></li><li class="L6"><span class="pun">{</span></li><li class="L7"><span class="pln">    FILE</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Log</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> NULL</span><span class="pun">;</span></li><li class="L8"><span class="pln">    fopen_s</span><span class="pun">(&amp;</span><span class="typ">Log</span><span class="pun">,</span><span class="pln"> </span><span class="str">"NameDump.txt"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"w+"</span><span class="pun">);</span></li><li class="L9"><span class="pln">&nbsp;</span></li><li class="L0"><span class="pln">    </span><span class="kwd">for</span><span class="pln"> </span><span class="pun">(</span><span class="pln">DWORD64 i </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0x0</span><span class="pun">;</span><span class="pln"> i </span><span class="pun">&lt;</span><span class="pln"> </span><span class="typ">Names</span><span class="pun">-&gt;</span><span class="typ">Num</span><span class="pun">();</span><span class="pln"> i</span><span class="pun">++)</span></li><li class="L1"><span class="pln">    </span><span class="pun">{</span></li><li class="L2"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(!</span><span class="typ">Names</span><span class="pun">-&gt;</span><span class="typ">GetById</span><span class="pun">(</span><span class="pln">i</span><span class="pun">))</span><span class="pln"> </span><span class="pun">{</span><span class="pln"> </span><span class="kwd">continue</span><span class="pun">;</span><span class="pln"> </span><span class="pun">}</span></li><li class="L3"><span class="pln">&nbsp;</span></li><li class="L4"><span class="pln">        fprintf</span><span class="pun">(</span><span class="typ">Log</span><span class="pun">,</span><span class="pln"> </span><span class="str">"Name[%06i] %s\n"</span><span class="pun">,</span><span class="pln"> i</span><span class="pun">,</span><span class="pln"> </span><span class="typ">Names</span><span class="pun">-&gt;</span><span class="typ">GetById</span><span class="pun">(</span><span class="pln">i</span><span class="pun">)-&gt;</span><span class="typ">AnsiName</span><span class="pun">);</span></li><li class="L5"><span class="pln">    </span><span class="pun">}</span></li><li class="L6"><span class="pln">&nbsp;</span></li><li class="L7"><span class="pln">    fclose</span><span class="pun">(</span><span class="typ">Log</span><span class="pun">);</span></li><li class="L8"><span class="pun">}</span></li></ol></pre>
-</div>
+
+```c++
+void ObjectDump()
+{
+    FILE* Log = NULL;
+    fopen_s(&Log, "ObjectDump.txt", "w+");
+ 
+    for (DWORD64 i = 0x0; i < GObjObjects->ObjObjects.NumElements; i++)
+    {
+        if (!GObjObjects->ObjObjects.Objects[i].Object) { continue; }
+ 
+        fprintf(Log, "UObject[%06i] %-50s 0x%llX\n", i, GetName(GObjObjects->ObjObjects.Objects[i].Object), GObjObjects->ObjObjects.Objects[i].Object);
+    }
+ 
+    fclose(Log);
+}
+ 
+void NameDump()
+{
+    FILE* Log = NULL;
+    fopen_s(&Log, "NameDump.txt", "w+");
+ 
+    for (DWORD64 i = 0x0; i < Names->Num(); i++)
+    {
+        if (!Names->GetById(i)) { continue; }
+ 
+        fprintf(Log, "Name[%06i] %s\n", i, Names->GetById(i)->AnsiName);
+    }
+ 
+    fclose(Log);
+}
+```
+
 Ok so we can clearly see how the entire structure of GObject is different, in this case the program take in account FUObject, look inside for TUObject, goes to FUObjectItem and then takes the UObject:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 498px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">struct</span><span class="pln"> </span><span class="typ">UObject</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">    UCHAR   </span><span class="typ">Unknown</span><span class="pun">[</span><span class="lit">0x10</span><span class="pun">];</span><span class="pln">       </span><span class="com">// unknowed data</span></li><li class="L3"><span class="pln">    DWORD   </span><span class="typ">NameIndex</span><span class="pun">;</span><span class="pln">                              </span><span class="com">// struct FName</span></li><li class="L4"><span class="pun">};</span></li><li class="L5"><span class="pln">&nbsp;</span></li><li class="L6"><span class="kwd">class</span><span class="pln"> </span><span class="typ">FUObjectItem</span></li><li class="L7"><span class="pun">{</span></li><li class="L8"><span class="kwd">public</span><span class="pun">:</span></li><li class="L9"><span class="pln">    </span><span class="typ">UObject</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Object</span><span class="pun">;</span></li><li class="L0"><span class="pln">    __int32 </span><span class="typ">Flags</span><span class="pun">;</span></li><li class="L1"><span class="pln">    __int32 </span><span class="typ">ClusterIndex</span><span class="pun">;</span></li><li class="L2"><span class="pln">    __int32 </span><span class="typ">SerialNumber</span><span class="pun">;</span></li><li class="L3"><span class="pln">    </span><span class="kwd">char</span><span class="pln"> unknowndata_00</span><span class="pun">[</span><span class="lit">0x4</span><span class="pun">];</span><span class="pln"> </span><span class="com">//New</span></li><li class="L4"><span class="pun">};</span></li><li class="L5"><span class="pln">&nbsp;</span></li><li class="L6"><span class="kwd">class</span><span class="pln"> </span><span class="typ">TUObjectArray</span></li><li class="L7"><span class="pun">{</span></li><li class="L8"><span class="kwd">public</span><span class="pun">:</span></li><li class="L9"><span class="pln">    </span><span class="typ">FUObjectItem</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Objects</span><span class="pun">;</span></li><li class="L0"><span class="pln">    __int32 </span><span class="typ">MaxElements</span><span class="pun">;</span></li><li class="L1"><span class="pln">    __int32 </span><span class="typ">NumElements</span><span class="pun">;</span></li><li class="L2"><span class="pun">};</span></li><li class="L3"><span class="pln">&nbsp;</span></li><li class="L4"><span class="kwd">class</span><span class="pln"> </span><span class="typ">FUObjectArray</span></li><li class="L5"><span class="pun">{</span></li><li class="L6"><span class="kwd">public</span><span class="pun">:</span></li><li class="L7"><span class="pln">    __int32 </span><span class="typ">ObjFirstGCIndex</span><span class="pun">;</span><span class="pln"> </span><span class="com">//0x0000</span></li><li class="L8"><span class="pln">    __int32 </span><span class="typ">ObjLastNonGCIndex</span><span class="pun">;</span><span class="pln"> </span><span class="com">//0x0004</span></li><li class="L9"><span class="pln">    __int32 </span><span class="typ">MaxObjectsNotConsideredByGC</span><span class="pun">;</span><span class="pln"> </span><span class="com">//0x0008</span></li><li class="L0"><span class="pln">    __int32 </span><span class="typ">OpenForDisregardForGC</span><span class="pun">;</span><span class="pln"> </span><span class="com">//0x000C</span></li><li class="L1"><span class="pln">&nbsp;</span></li><li class="L2"><span class="pln">    </span><span class="typ">TUObjectArray</span><span class="pln"> </span><span class="typ">ObjObjects</span><span class="pun">;</span></li><li class="L3"><span class="pun">};</span></li></ol></pre>
-</div>
+
+```c++
+struct UObject
+{
+    UCHAR   Unknown[0x10];       // unknowed data
+    DWORD   NameIndex;                              // struct FName
+};
+ 
+class FUObjectItem
+{
+public:
+    UObject* Object;
+    __int32 Flags;
+    __int32 ClusterIndex;
+    __int32 SerialNumber;
+    char unknowndata_00[0x4]; //New
+};
+ 
+class TUObjectArray
+{
+public:
+    FUObjectItem* Objects;
+    __int32 MaxElements;
+    __int32 NumElements;
+};
+ 
+class FUObjectArray
+{
+public:
+    __int32 ObjFirstGCIndex; //0x0000
+    __int32 ObjLastNonGCIndex; //0x0004
+    __int32 MaxObjectsNotConsideredByGC; //0x0008
+    __int32 OpenForDisregardForGC; //0x000C
+ 
+    TUObjectArray ObjObjects;
+};
+```
+
 We don't need any of that, just comment it out.<br>
 Then we can change the ObjectDump method to suits us:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 290px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">void</span><span class="pln"> </span><span class="typ">ObjectDump</span><span class="pun">()</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">    FILE</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Log</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> NULL</span><span class="pun">;</span></li><li class="L3"><span class="pln">    fopen_s</span><span class="pun">(&amp;</span><span class="typ">Log</span><span class="pun">,</span><span class="pln"> </span><span class="str">"ObjectDump.txt"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"w+"</span><span class="pun">);</span></li><li class="L4"><span class="pln">&nbsp;</span></li><li class="L5"><span class="pln">    </span><span class="com">//for (DWORD64 i = 0x0; i &lt; GObjObjects-&gt;ObjObjects.NumElements; i++)</span></li><li class="L6"><span class="pln">    </span><span class="kwd">for</span><span class="pln"> </span><span class="pun">(</span><span class="pln">DWORD64 i </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0x0</span><span class="pun">;</span><span class="pln"> i </span><span class="pun">&lt;</span><span class="pln"> </span><span class="typ">GObjObjects</span><span class="pun">-&gt;</span><span class="typ">Num</span><span class="pun">();</span><span class="pln"> i</span><span class="pun">++)</span></li><li class="L7"><span class="pln">    </span><span class="pun">{</span></li><li class="L8"><span class="pln">        </span><span class="com">//if (!GObjObjects-&gt;ObjObjects.Objects[i].Object) { continue; }</span></li><li class="L9"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(!</span><span class="typ">GObjObjects</span><span class="pun">-&gt;</span><span class="typ">GetById</span><span class="pun">(</span><span class="pln">i</span><span class="pun">))</span><span class="pln"> </span><span class="pun">{</span><span class="pln"> </span><span class="kwd">continue</span><span class="pun">;</span><span class="pln"> </span><span class="pun">}</span></li><li class="L0"><span class="pln">&nbsp;</span></li><li class="L1"><span class="pln">        </span><span class="com">//fprintf(Log, "UObject[%06i] %-50s 0x%llX\n", i, GetName(GObjObjects-&gt;ObjObjects.Objects[i].Object), GObjObjects-&gt;ObjObjects.Objects[i].Object);</span></li><li class="L2"><span class="pln">        fprintf</span><span class="pun">(</span><span class="typ">Log</span><span class="pun">,</span><span class="pln"> </span><span class="str">"UObject[%06i] %-50s 0x%p\n"</span><span class="pun">,</span><span class="pln"> i</span><span class="pun">,</span><span class="pln"> </span><span class="typ">GetName</span><span class="pun">(</span><span class="typ">GObjObjects</span><span class="pun">-&gt;</span><span class="typ">GetById</span><span class="pun">(</span><span class="pln">i</span><span class="pun">)),</span><span class="pln"> </span><span class="typ">GObjObjects</span><span class="pun">-&gt;</span><span class="typ">GetById</span><span class="pun">(</span><span class="pln">i</span><span class="pun">));</span></li><li class="L3"><span class="pln">    </span><span class="pun">}</span></li><li class="L4"><span class="pln">&nbsp;</span></li><li class="L5"><span class="pln">    fclose</span><span class="pun">(</span><span class="typ">Log</span><span class="pun">);</span></li><li class="L6"><span class="pun">}</span></li></ol></pre>
-</div>
+
+```c++
+void ObjectDump()
+{
+    FILE* Log = NULL;
+    fopen_s(&Log, "ObjectDump.txt", "w+");
+ 
+    //for (DWORD64 i = 0x0; i < GObjObjects->ObjObjects.NumElements; i++)
+    for (DWORD64 i = 0x0; i < GObjObjects->Num(); i++)
+    {
+        //if (!GObjObjects->ObjObjects.Objects[i].Object) { continue; }
+        if (!GObjObjects->GetById(i)) { continue; }
+ 
+        //fprintf(Log, "UObject[%06i] %-50s 0x%llX\n", i, GetName(GObjObjects->ObjObjects.Objects[i].Object), GObjObjects->ObjObjects.Objects[i].Object);
+        fprintf(Log, "UObject[%06i] %-50s 0x%p\n", i, GetName(GObjObjects->GetById(i)), GObjObjects->GetById(i));
+    }
+ 
+    fclose(Log);
+}
+```
+
 NameDump() iterates the array, and for every member prints the index then goes into the AnsiName variable ant prints it into the file.<br>
 <br>
 ObjectDump() iterates the array, and for every member prints the index, prints the return value of GetName() and prints the address of the Object.<br>
 <br>
 Ok only GetName() remains:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 258px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">char</span><span class="pun">*</span><span class="pln"> </span><span class="typ">GetName</span><span class="pun">(</span><span class="typ">UObject</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Object</span><span class="pun">)</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">    DWORD64 </span><span class="typ">NameIndex</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">*(</span><span class="pln">PDWORD64</span><span class="pun">)((</span><span class="pln">DWORD64</span><span class="pun">)</span><span class="typ">Object</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="typ">Offset_Name</span><span class="pun">);</span></li><li class="L3"><span class="pln">&nbsp;</span></li><li class="L4"><span class="pln">    </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="typ">NameIndex</span><span class="pln"> </span><span class="pun">&lt;</span><span class="pln"> </span><span class="lit">0</span><span class="pln"> </span><span class="pun">||</span><span class="pln"> </span><span class="typ">NameIndex</span><span class="pln"> </span><span class="pun">&gt;</span><span class="pln"> </span><span class="typ">Names</span><span class="pun">-&gt;</span><span class="typ">Num</span><span class="pun">())</span></li><li class="L5"><span class="pln">    </span><span class="pun">{</span></li><li class="L6"><span class="pln">        </span><span class="kwd">static</span><span class="pln"> </span><span class="kwd">char</span><span class="pln"> ret</span><span class="pun">[</span><span class="lit">256</span><span class="pun">];</span></li><li class="L7"><span class="pln">        sprintf_s</span><span class="pun">(</span><span class="pln">ret</span><span class="pun">,</span><span class="pln"> </span><span class="str">"INVALID NAME INDEX : %i &gt; %i"</span><span class="pun">,</span><span class="pln"> </span><span class="typ">NameIndex</span><span class="pun">,</span><span class="pln"> </span><span class="typ">Names</span><span class="pun">-&gt;</span><span class="typ">Num</span><span class="pun">());</span></li><li class="L8"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> ret</span><span class="pun">;</span></li><li class="L9"><span class="pln">    </span><span class="pun">}</span></li><li class="L0"><span class="pln">    </span><span class="kwd">else</span></li><li class="L1"><span class="pln">    </span><span class="pun">{</span></li><li class="L2"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">char</span><span class="pun">*)</span><span class="typ">Names</span><span class="pun">-&gt;</span><span class="typ">GetById</span><span class="pun">(</span><span class="typ">NameIndex</span><span class="pun">)-&gt;</span><span class="typ">AnsiName</span><span class="pun">;</span></li><li class="L3"><span class="pln">    </span><span class="pun">}</span></li><li class="L4"><span class="pun">}</span></li></ol></pre>
-</div>
+
+```c++
+char* GetName(UObject* Object)
+{
+    DWORD64 NameIndex = *(PDWORD64)((DWORD64)Object + Offset_Name);
+ 
+    if (NameIndex < 0 || NameIndex > Names->Num())
+    {
+        static char ret[256];
+        sprintf_s(ret, "INVALID NAME INDEX : %i > %i", NameIndex, Names->Num());
+        return ret;
+    }
+    else
+    {
+        return (char*)Names->GetById(NameIndex)->AnsiName;
+    }
+}
+```
+
 Ok for start, the first line is complicated for nothing here, it want to understand where is the offset of the FName index<br>
 Well... just:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 34px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="kwd">int</span><span class="pln"> </span><span class="typ">NameIndex</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">Object</span><span class="pun">-&gt;</span><span class="typ">NameIndex</span><span class="pun">;</span></li></ol></pre>
-</div>
+
+```c++
+int NameIndex = Object->NameIndex;
+```
+
 All the rest seems good, it take the FName Index of the object and it goes to see what matches in the Names array.<br>
 <br>
 GetModuleInfo, bDataCompare and FindPattern are for sigs, I haven't even looked at them, I hate sigs, I don't understand them. <img src="https://www.unknowncheats.me/forum/images/smilies/angry.gif" border="0" alt="" title="angry" class="inlineimg"><br>
 <br>
 Ok so our modified version should look like this:<br>
 <br>
-<div style="margin:20px; margin-top:5px">
-<div class="smallfont" style="margin-bottom:2px">Code:</div>
-<pre class="prettyprint linenums prettyprinted" dir="ltr" style="margin: 0px; max-height: 498px; text-align: left; overflow: auto;"><ol class="linenums"><li class="L0"><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;Windows.h&gt;</span></li><li class="L1"><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;stdio.h&gt;</span></li><li class="L2"><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;Psapi.h&gt;</span></li><li class="L3"><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;cstring&gt;</span></li><li class="L4"><span class="com">#include</span><span class="pln"> </span><span class="str">&lt;iostream&gt;</span></li><li class="L5"><span class="pln">&nbsp;</span></li><li class="L6"><span class="pln">DWORD64   </span><span class="typ">GObjObjects_offset</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> NULL</span><span class="pun">;</span></li><li class="L7"><span class="pln">DWORD64   </span><span class="typ">Names_offset</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> NULL</span><span class="pun">;</span></li><li class="L8"><span class="pln">&nbsp;</span></li><li class="L9"><span class="pln">emplate</span><span class="pun">&lt;</span><span class="kwd">typename</span><span class="pln"> </span><span class="typ">ElementType</span><span class="pun">,</span><span class="pln"> __int32 </span><span class="typ">MaxTotalElements</span><span class="pun">,</span><span class="pln"> __int32 </span><span class="typ">ElementsPerChunk</span><span class="pun">&gt;</span></li><li class="L0"><span class="kwd">class</span><span class="pln"> </span><span class="typ">TStaticIndirectArrayThreadSafeRead</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="kwd">public</span><span class="pun">:</span></li><li class="L3"><span class="pln">    __int32 </span><span class="typ">Num</span><span class="pun">()</span><span class="pln"> </span><span class="kwd">const</span></li><li class="L4"><span class="pln">    </span><span class="pun">{</span></li><li class="L5"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> numElements</span><span class="pun">;</span></li><li class="L6"><span class="pln">    </span><span class="pun">}</span></li><li class="L7"><span class="pln">&nbsp;</span></li><li class="L8"><span class="pln">    </span><span class="kwd">bool</span><span class="pln"> </span><span class="typ">IsValidIndex</span><span class="pun">(</span><span class="pln">__int32 index</span><span class="pun">)</span><span class="pln"> </span><span class="kwd">const</span></li><li class="L9"><span class="pln">    </span><span class="pun">{</span></li><li class="L0"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> index </span><span class="pun">&gt;=</span><span class="pln"> </span><span class="lit">0</span><span class="pln"> </span><span class="pun">&amp;&amp;</span><span class="pln"> index </span><span class="pun">&lt;</span><span class="pln"> </span><span class="typ">Num</span><span class="pun">()</span><span class="pln"> </span><span class="pun">&amp;&amp;</span><span class="pln"> </span><span class="typ">GetById</span><span class="pun">(</span><span class="pln">index</span><span class="pun">)</span><span class="pln"> </span><span class="pun">!=</span><span class="pln"> </span><span class="kwd">nullptr</span><span class="pun">;</span></li><li class="L1"><span class="pln">    </span><span class="pun">}</span></li><li class="L2"><span class="pln">&nbsp;</span></li><li class="L3"><span class="pln">    </span><span class="typ">ElementType</span><span class="pln"> </span><span class="kwd">const</span><span class="pun">*</span><span class="pln"> </span><span class="kwd">const</span><span class="pun">&amp;</span><span class="pln"> </span><span class="typ">GetById</span><span class="pun">(</span><span class="pln">__int32 index</span><span class="pun">)</span><span class="pln"> </span><span class="kwd">const</span></li><li class="L4"><span class="pln">    </span><span class="pun">{</span></li><li class="L5"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln">doonce</span><span class="pun">)</span><span class="pln"> std</span><span class="pun">::</span><span class="pln">cout </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"*GetItemPtr(index): "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="pun">*</span><span class="typ">GetItemPtr</span><span class="pun">(</span><span class="pln">index</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">" GetItemPtr(index): "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="typ">GetItemPtr</span><span class="pun">(</span><span class="pln">index</span><span class="pun">)</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln">  std</span><span class="pun">::</span><span class="pln">endl</span><span class="pun">;</span></li><li class="L6"><span class="pln">        doonce </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">false</span><span class="pun">;</span></li><li class="L7"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> </span><span class="pun">*</span><span class="typ">GetItemPtr</span><span class="pun">(</span><span class="pln">index</span><span class="pun">);</span></li><li class="L8"><span class="pln">    </span><span class="pun">}</span></li><li class="L9"><span class="pln">&nbsp;</span></li><li class="L0"><span class="kwd">private</span><span class="pun">:</span></li><li class="L1"><span class="pln">    </span><span class="typ">ElementType</span><span class="pln"> </span><span class="kwd">const</span><span class="pun">*</span><span class="pln"> </span><span class="kwd">const</span><span class="pun">*</span><span class="pln"> </span><span class="typ">GetItemPtr</span><span class="pun">(</span><span class="pln">__int32 </span><span class="typ">Index</span><span class="pun">)</span><span class="pln"> </span><span class="kwd">const</span></li><li class="L2"><span class="pln">    </span><span class="pun">{</span></li><li class="L3"><span class="pln">        </span><span class="kwd">const</span><span class="pln"> __int32 </span><span class="typ">ChunkIndex</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">Index</span><span class="pln"> </span><span class="pun">/</span><span class="pln"> </span><span class="typ">ElementsPerChunk</span><span class="pun">;</span></li><li class="L4"><span class="pln">        </span><span class="kwd">const</span><span class="pln"> __int32 </span><span class="typ">WithinChunkIndex</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">Index</span><span class="pln"> </span><span class="pun">%</span><span class="pln"> </span><span class="typ">ElementsPerChunk</span><span class="pun">;</span></li><li class="L5"><span class="pln">        </span><span class="kwd">const</span><span class="pln"> </span><span class="kwd">auto</span><span class="pln"> </span><span class="typ">Chunk</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> chunks</span><span class="pun">[</span><span class="typ">ChunkIndex</span><span class="pun">];</span></li><li class="L6"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="pln">doonce2</span><span class="pun">)</span><span class="pln"> std</span><span class="pun">::</span><span class="pln">cout </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">"Chunk: "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="typ">Chunk</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">" chunks[ChunkIndex]: "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> chunks</span><span class="pun">[</span><span class="typ">ChunkIndex</span><span class="pun">]</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="str">" Chunk + WithinChunkIndex: "</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="typ">Chunk</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="typ">WithinChunkIndex</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> std</span><span class="pun">::</span><span class="pln">endl</span><span class="pun">;</span></li><li class="L7"><span class="pln">        doonce2 </span><span class="pun">=</span><span class="pln"> </span><span class="kwd">false</span><span class="pun">;</span></li><li class="L8"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> </span><span class="typ">Chunk</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="typ">WithinChunkIndex</span><span class="pun">;</span></li><li class="L9"><span class="pln">    </span><span class="pun">}</span></li><li class="L0"><span class="pln">&nbsp;</span></li><li class="L1"><span class="pln">    </span><span class="kwd">enum</span></li><li class="L2"><span class="pln">    </span><span class="pun">{</span></li><li class="L3"><span class="pln">        </span><span class="typ">ChunkTableSize</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span><span class="typ">MaxTotalElements</span><span class="pln"> </span><span class="pun">+</span><span class="pln"> </span><span class="typ">ElementsPerChunk</span><span class="pln"> </span><span class="pun">-</span><span class="pln"> </span><span class="lit">1</span><span class="pun">)</span><span class="pln"> </span><span class="pun">/</span><span class="pln"> </span><span class="typ">ElementsPerChunk</span></li><li class="L4"><span class="pln">    </span><span class="pun">};</span></li><li class="L5"><span class="pln">&nbsp;</span></li><li class="L6"><span class="pln">    </span><span class="typ">ElementType</span><span class="pun">**</span><span class="pln"> chunks</span><span class="pun">[</span><span class="typ">ChunkTableSize</span><span class="pun">];</span></li><li class="L7"><span class="pln">    __int32 numElements</span><span class="pun">;</span></li><li class="L8"><span class="pln">    __int32 numChunks</span><span class="pun">;</span></li><li class="L9"><span class="pun">};</span></li><li class="L0"><span class="pln">&nbsp;</span></li><li class="L1"><span class="kwd">struct</span><span class="pln"> </span><span class="typ">UObjectBase</span></li><li class="L2"><span class="pun">{</span></li><li class="L3"><span class="pln">    UCHAR   </span><span class="typ">Unknown</span><span class="pun">[</span><span class="lit">0x18</span><span class="pun">];</span><span class="pln">       </span><span class="com">// unknowed data</span></li><li class="L4"><span class="pln">    DWORD   </span><span class="typ">NameIndex</span><span class="pun">;</span><span class="pln">                              </span><span class="com">// struct FName</span></li><li class="L5"><span class="pun">};</span></li><li class="L6"><span class="pln">&nbsp;</span></li><li class="L7"><span class="kwd">using</span><span class="pln"> </span><span class="typ">TUObjectArray</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">TStaticIndirectArrayThreadSafeRead</span><span class="pun">&lt;</span><span class="typ">UObjectBase</span><span class="pun">,</span><span class="pln"> </span><span class="lit">8</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="lit">1024</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="lit">1024</span><span class="pun">,</span><span class="pln"> </span><span class="lit">16384</span><span class="pun">&gt;;</span></li><li class="L8"><span class="pln">&nbsp;</span></li><li class="L9"><span class="kwd">struct</span><span class="pln"> </span><span class="typ">FNameEntry</span></li><li class="L0"><span class="pun">{</span></li><li class="L1"><span class="pln">    </span><span class="kwd">int</span><span class="pln"> </span><span class="typ">Index</span><span class="pun">;</span></li><li class="L2"><span class="pln">    </span><span class="kwd">char</span><span class="pln"> pad_0x0004</span><span class="pun">[</span><span class="lit">0x4</span><span class="pun">];</span></li><li class="L3"><span class="pln">    </span><span class="typ">FNameEntry</span><span class="pun">*</span><span class="pln"> </span><span class="typ">HashNext</span><span class="pun">;</span></li><li class="L4"><span class="pln">    </span><span class="kwd">char</span><span class="pln"> </span><span class="typ">AnsiName</span><span class="pun">[</span><span class="lit">1024</span><span class="pun">];</span></li><li class="L5"><span class="pun">};</span></li><li class="L6"><span class="pln">&nbsp;</span></li><li class="L7"><span class="kwd">using</span><span class="pln"> </span><span class="typ">TNameEntryArray</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">TStaticIndirectArrayThreadSafeRead</span><span class="pun">&lt;</span><span class="typ">FNameEntry</span><span class="pun">,</span><span class="pln"> </span><span class="lit">2</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="lit">1024</span><span class="pln"> </span><span class="pun">*</span><span class="pln"> </span><span class="lit">1024</span><span class="pun">,</span><span class="pln"> </span><span class="lit">16384</span><span class="pun">&gt;;</span></li><li class="L8"><span class="pln">&nbsp;</span></li><li class="L9"><span class="typ">TUObjectArray</span><span class="pun">*</span><span class="pln"> </span><span class="typ">GObjObjects</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> NULL</span><span class="pun">;</span></li><li class="L0"><span class="typ">TNameEntryArray</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Names</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> NULL</span><span class="pun">;</span></li><li class="L1"><span class="pln">&nbsp;</span></li><li class="L2"><span class="kwd">char</span><span class="pun">*</span><span class="pln"> </span><span class="typ">GetName</span><span class="pun">(</span><span class="kwd">const</span><span class="pln"> </span><span class="typ">UObjectBase</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Object</span><span class="pun">)</span></li><li class="L3"><span class="pun">{</span></li><li class="L4"><span class="pln">    </span><span class="kwd">int</span><span class="pln"> </span><span class="typ">NameIndex</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="typ">Object</span><span class="pun">-&gt;</span><span class="typ">NameIndex</span><span class="pun">;</span></li><li class="L5"><span class="pln">&nbsp;</span></li><li class="L6"><span class="pln">    std</span><span class="pun">::</span><span class="pln">cout </span><span class="pun">&lt;&lt;</span><span class="pln"> </span><span class="typ">NameIndex</span><span class="pln"> </span><span class="pun">&lt;&lt;</span><span class="pln"> std</span><span class="pun">::</span><span class="pln">endl</span><span class="pun">;</span></li><li class="L7"><span class="pln">&nbsp;</span></li><li class="L8"><span class="pln">    </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(</span><span class="typ">NameIndex</span><span class="pln"> </span><span class="pun">&lt;</span><span class="pln"> </span><span class="lit">0</span><span class="pln"> </span><span class="pun">||</span><span class="pln"> </span><span class="typ">NameIndex</span><span class="pln"> </span><span class="pun">&gt;</span><span class="pln"> </span><span class="typ">Names</span><span class="pun">-&gt;</span><span class="typ">Num</span><span class="pun">())</span></li><li class="L9"><span class="pln">    </span><span class="pun">{</span></li><li class="L0"><span class="pln">        </span><span class="kwd">static</span><span class="pln"> </span><span class="kwd">char</span><span class="pln"> ret</span><span class="pun">[</span><span class="lit">256</span><span class="pun">];</span></li><li class="L1"><span class="pln">        sprintf_s</span><span class="pun">(</span><span class="pln">ret</span><span class="pun">,</span><span class="pln"> </span><span class="str">"INVALID NAME INDEX : %i &gt; %i"</span><span class="pun">,</span><span class="pln"> </span><span class="typ">NameIndex</span><span class="pun">,</span><span class="pln"> </span><span class="typ">Names</span><span class="pun">-&gt;</span><span class="typ">Num</span><span class="pun">());</span></li><li class="L2"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> ret</span><span class="pun">;</span></li><li class="L3"><span class="pln">    </span><span class="pun">}</span></li><li class="L4"><span class="pln">    </span><span class="kwd">else</span></li><li class="L5"><span class="pln">    </span><span class="pun">{</span></li><li class="L6"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> </span><span class="pun">(</span><span class="kwd">char</span><span class="pun">*)</span><span class="typ">Names</span><span class="pun">-&gt;</span><span class="typ">GetById</span><span class="pun">(</span><span class="typ">NameIndex</span><span class="pun">)-&gt;</span><span class="typ">AnsiName</span><span class="pun">;</span></li><li class="L7"><span class="pln">    </span><span class="pun">}</span></li><li class="L8"><span class="pun">}</span></li><li class="L9"><span class="pln">&nbsp;</span></li><li class="L0"><span class="kwd">void</span><span class="pln"> </span><span class="typ">ObjectDump</span><span class="pun">()</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">    FILE</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Log</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> NULL</span><span class="pun">;</span></li><li class="L3"><span class="pln">    fopen_s</span><span class="pun">(&amp;</span><span class="typ">Log</span><span class="pun">,</span><span class="pln"> </span><span class="str">"ObjectDump.txt"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"w+"</span><span class="pun">);</span></li><li class="L4"><span class="pln">&nbsp;</span></li><li class="L5"><span class="pln">    </span><span class="kwd">for</span><span class="pln"> </span><span class="pun">(</span><span class="pln">DWORD64 i </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0x0</span><span class="pun">;</span><span class="pln"> i </span><span class="pun">&lt;</span><span class="pln"> </span><span class="typ">GObjObjects</span><span class="pun">-&gt;</span><span class="typ">Num</span><span class="pun">();</span><span class="pln"> i</span><span class="pun">++)</span></li><li class="L6"><span class="pln">    </span><span class="pun">{</span></li><li class="L7"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(!</span><span class="typ">GObjObjects</span><span class="pun">-&gt;</span><span class="typ">GetById</span><span class="pun">(</span><span class="pln">i</span><span class="pun">))</span><span class="pln"> </span><span class="pun">{</span><span class="pln"> </span><span class="kwd">continue</span><span class="pun">;</span><span class="pln"> </span><span class="pun">}</span></li><li class="L8"><span class="pln">&nbsp;</span></li><li class="L9"><span class="pln">        fprintf</span><span class="pun">(</span><span class="typ">Log</span><span class="pun">,</span><span class="pln"> </span><span class="str">"UObject[%06i] %-50s 0x%p\n"</span><span class="pun">,</span><span class="pln"> i</span><span class="pun">,</span><span class="pln"> </span><span class="typ">GetName</span><span class="pun">(</span><span class="typ">GObjObjects</span><span class="pun">-&gt;</span><span class="typ">GetById</span><span class="pun">(</span><span class="pln">i</span><span class="pun">)),</span><span class="pln"> </span><span class="typ">GObjObjects</span><span class="pun">-&gt;</span><span class="typ">GetById</span><span class="pun">(</span><span class="pln">i</span><span class="pun">));</span></li><li class="L0"><span class="pln">    </span><span class="pun">}</span></li><li class="L1"><span class="pln">&nbsp;</span></li><li class="L2"><span class="pln">    fclose</span><span class="pun">(</span><span class="typ">Log</span><span class="pun">);</span></li><li class="L3"><span class="pun">}</span></li><li class="L4"><span class="pln">&nbsp;</span></li><li class="L5"><span class="kwd">void</span><span class="pln"> </span><span class="typ">NameDump</span><span class="pun">()</span></li><li class="L6"><span class="pun">{</span></li><li class="L7"><span class="pln">    FILE</span><span class="pun">*</span><span class="pln"> </span><span class="typ">Log</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> NULL</span><span class="pun">;</span></li><li class="L8"><span class="pln">    fopen_s</span><span class="pun">(&amp;</span><span class="typ">Log</span><span class="pun">,</span><span class="pln"> </span><span class="str">"NameDump.txt"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"w+"</span><span class="pun">);</span></li><li class="L9"><span class="pln">&nbsp;</span></li><li class="L0"><span class="pln">    </span><span class="kwd">for</span><span class="pln"> </span><span class="pun">(</span><span class="pln">DWORD64 i </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0x0</span><span class="pun">;</span><span class="pln"> i </span><span class="pun">&lt;</span><span class="pln"> </span><span class="typ">Names</span><span class="pun">-&gt;</span><span class="typ">Num</span><span class="pun">();</span><span class="pln"> i</span><span class="pun">++)</span></li><li class="L1"><span class="pln">    </span><span class="pun">{</span></li><li class="L2"><span class="pln">        </span><span class="kwd">if</span><span class="pln"> </span><span class="pun">(!</span><span class="typ">Names</span><span class="pun">-&gt;</span><span class="typ">GetById</span><span class="pun">(</span><span class="pln">i</span><span class="pun">))</span><span class="pln"> </span><span class="pun">{</span><span class="pln"> </span><span class="kwd">continue</span><span class="pun">;</span><span class="pln"> </span><span class="pun">}</span></li><li class="L3"><span class="pln">&nbsp;</span></li><li class="L4"><span class="pln">        fprintf</span><span class="pun">(</span><span class="typ">Log</span><span class="pun">,</span><span class="pln"> </span><span class="str">"Name[%06i] %s\n "</span><span class="pun">,</span><span class="pln"> i</span><span class="pun">,</span><span class="pln"> </span><span class="typ">Names</span><span class="pun">-&gt;</span><span class="typ">GetById</span><span class="pun">(</span><span class="pln">i</span><span class="pun">)-&gt;</span><span class="typ">AnsiName</span><span class="pun">);</span></li><li class="L5"><span class="pln">    </span><span class="pun">}</span></li><li class="L6"><span class="pln">&nbsp;</span></li><li class="L7"><span class="pln">    fclose</span><span class="pun">(</span><span class="typ">Log</span><span class="pun">);</span></li><li class="L8"><span class="pun">}</span></li><li class="L9"><span class="pln">&nbsp;</span></li><li class="L0"><span class="kwd">void</span><span class="pln"> onAttach</span><span class="pun">()</span></li><li class="L1"><span class="pun">{</span></li><li class="L2"><span class="pln">    </span><span class="typ">AllocConsole</span><span class="pun">();</span></li><li class="L3"><span class="pln">    freopen</span><span class="pun">(</span><span class="str">"CONOUT$"</span><span class="pun">,</span><span class="pln"> </span><span class="str">"w"</span><span class="pun">,</span><span class="pln"> stdout</span><span class="pun">);</span></li><li class="L4"><span class="pln">&nbsp;</span></li><li class="L5"><span class="pln">    MODULEINFO miGame </span><span class="pun">=</span><span class="pln"> </span><span class="typ">GetModuleInfo</span><span class="pun">(</span><span class="pln">NULL</span><span class="pun">);</span></li><li class="L6"><span class="pln">&nbsp;</span></li><li class="L7"><span class="pln">    </span><span class="typ">GObjObjects_offset</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">((</span><span class="pln">DWORD64</span><span class="pun">)</span><span class="pln">miGame</span><span class="pun">.</span><span class="pln">lpBaseOfDll </span><span class="pun">+</span><span class="pln"> </span><span class="lit">0x21EDE80</span><span class="pun">);</span></li><li class="L8"><span class="pln">    </span><span class="typ">Names_offset</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(*(</span><span class="pln">DWORD64</span><span class="pun">*)((</span><span class="pln">DWORD64</span><span class="pun">)</span><span class="pln">miGame</span><span class="pun">.</span><span class="pln">lpBaseOfDll </span><span class="pun">+</span><span class="pln"> </span><span class="lit">0x21DD6B8</span><span class="pun">));</span></li><li class="L9"><span class="pln">&nbsp;</span></li><li class="L0"><span class="pln">    </span><span class="typ">GObjObjects</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span><span class="typ">TUObjectArray</span><span class="pun">*)</span><span class="typ">GObjObjects_offset</span><span class="pun">;</span></li><li class="L1"><span class="pln">    </span><span class="typ">Names</span><span class="pln"> </span><span class="pun">=</span><span class="pln"> </span><span class="pun">(</span><span class="typ">TNameEntryArray</span><span class="pun">*)</span><span class="typ">Names_offset</span><span class="pun">;</span></li><li class="L2"><span class="pln">&nbsp;</span></li><li class="L3"><span class="pln">    </span><span class="typ">NameDump</span><span class="pun">();</span></li><li class="L4"><span class="pln">    </span><span class="typ">ObjectDump</span><span class="pun">();</span></li><li class="L5"><span class="pun">}</span></li><li class="L6"><span class="pln">&nbsp;</span></li><li class="L7"><span class="pln">BOOL WINAPI </span><span class="typ">DllMain</span><span class="pun">(</span><span class="pln">HMODULE hModule</span><span class="pun">,</span><span class="pln"> DWORD dwReason</span><span class="pun">,</span><span class="pln"> LPVOID lpReserved</span><span class="pun">)</span></li><li class="L8"><span class="pun">{</span></li><li class="L9"><span class="pln">    </span><span class="kwd">switch</span><span class="pln"> </span><span class="pun">(</span><span class="pln">dwReason</span><span class="pun">)</span></li><li class="L0"><span class="pln">    </span><span class="pun">{</span></li><li class="L1"><span class="pln">    </span><span class="kwd">case</span><span class="pln"> DLL_PROCESS_ATTACH</span><span class="pun">:</span></li><li class="L2"><span class="pln">        </span><span class="typ">DisableThreadLibraryCalls</span><span class="pun">(</span><span class="pln">hModule</span><span class="pun">);</span></li><li class="L3"><span class="pln">        </span><span class="typ">CreateThread</span><span class="pun">(</span><span class="pln">NULL</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0</span><span class="pun">,</span><span class="pln"> </span><span class="pun">(</span><span class="pln">LPTHREAD_START_ROUTINE</span><span class="pun">)</span><span class="pln">onAttach</span><span class="pun">,</span><span class="pln"> NULL</span><span class="pun">,</span><span class="pln"> </span><span class="lit">0</span><span class="pun">,</span><span class="pln"> NULL</span><span class="pun">);</span></li><li class="L4"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> </span><span class="kwd">true</span><span class="pun">;</span></li><li class="L5"><span class="pln">        </span><span class="kwd">break</span><span class="pun">;</span></li><li class="L6"><span class="pln">&nbsp;</span></li><li class="L7"><span class="pln">    </span><span class="kwd">case</span><span class="pln"> DLL_PROCESS_DETACH</span><span class="pun">:</span></li><li class="L8"><span class="pln">        </span><span class="kwd">return</span><span class="pln"> </span><span class="kwd">true</span><span class="pun">;</span></li><li class="L9"><span class="pln">        </span><span class="kwd">break</span><span class="pun">;</span></li><li class="L0"><span class="pln">    </span><span class="pun">}</span></li><li class="L1"><span class="pun">}</span></li></ol></pre>
-</div>
+
+```c++
+#include <Windows.h>
+#include <stdio.h>
+#include <Psapi.h>
+#include <cstring>
+#include <iostream>
+ 
+DWORD64   GObjObjects_offset = NULL;
+DWORD64   Names_offset = NULL;
+ 
+emplate<typename ElementType, __int32 MaxTotalElements, __int32 ElementsPerChunk>
+class TStaticIndirectArrayThreadSafeRead
+{
+public:
+    __int32 Num() const
+    {
+        return numElements;
+    }
+ 
+    bool IsValidIndex(__int32 index) const
+    {
+        return index >= 0 && index < Num() && GetById(index) != nullptr;
+    }
+ 
+    ElementType const* const& GetById(__int32 index) const
+    {
+        if (doonce) std::cout << "*GetItemPtr(index): " << *GetItemPtr(index) << " GetItemPtr(index): " << GetItemPtr(index) <<  std::endl;
+        doonce = false;
+        return *GetItemPtr(index);
+    }
+ 
+private:
+    ElementType const* const* GetItemPtr(__int32 Index) const
+    {
+        const __int32 ChunkIndex = Index / ElementsPerChunk;
+        const __int32 WithinChunkIndex = Index % ElementsPerChunk;
+        const auto Chunk = chunks[ChunkIndex];
+        if (doonce2) std::cout << "Chunk: " << Chunk << " chunks[ChunkIndex]: " << chunks[ChunkIndex] << " Chunk + WithinChunkIndex: " << Chunk + WithinChunkIndex << std::endl;
+        doonce2 = false;
+        return Chunk + WithinChunkIndex;
+    }
+ 
+    enum
+    {
+        ChunkTableSize = (MaxTotalElements + ElementsPerChunk - 1) / ElementsPerChunk
+    };
+ 
+    ElementType** chunks[ChunkTableSize];
+    __int32 numElements;
+    __int32 numChunks;
+};
+ 
+struct UObjectBase
+{
+    UCHAR   Unknown[0x18];       // unknowed data
+    DWORD   NameIndex;                              // struct FName
+};
+ 
+using TUObjectArray = TStaticIndirectArrayThreadSafeRead<UObjectBase, 8 * 1024 * 1024, 16384>;
+ 
+struct FNameEntry
+{
+    int Index;
+    char pad_0x0004[0x4];
+    FNameEntry* HashNext;
+    char AnsiName[1024];
+};
+ 
+using TNameEntryArray = TStaticIndirectArrayThreadSafeRead<FNameEntry, 2 * 1024 * 1024, 16384>;
+ 
+TUObjectArray* GObjObjects = NULL;
+TNameEntryArray* Names = NULL;
+ 
+char* GetName(const UObjectBase* Object)
+{
+    int NameIndex = Object->NameIndex;
+ 
+    std::cout << NameIndex << std::endl;
+ 
+    if (NameIndex < 0 || NameIndex > Names->Num())
+    {
+        static char ret[256];
+        sprintf_s(ret, "INVALID NAME INDEX : %i > %i", NameIndex, Names->Num());
+        return ret;
+    }
+    else
+    {
+        return (char*)Names->GetById(NameIndex)->AnsiName;
+    }
+}
+ 
+void ObjectDump()
+{
+    FILE* Log = NULL;
+    fopen_s(&Log, "ObjectDump.txt", "w+");
+ 
+    for (DWORD64 i = 0x0; i < GObjObjects->Num(); i++)
+    {
+        if (!GObjObjects->GetById(i)) { continue; }
+ 
+        fprintf(Log, "UObject[%06i] %-50s 0x%p\n", i, GetName(GObjObjects->GetById(i)), GObjObjects->GetById(i));
+    }
+ 
+    fclose(Log);
+}
+ 
+void NameDump()
+{
+    FILE* Log = NULL;
+    fopen_s(&Log, "NameDump.txt", "w+");
+ 
+    for (DWORD64 i = 0x0; i < Names->Num(); i++)
+    {
+        if (!Names->GetById(i)) { continue; }
+ 
+        fprintf(Log, "Name[%06i] %s\n ", i, Names->GetById(i)->AnsiName);
+    }
+ 
+    fclose(Log);
+}
+ 
+void onAttach()
+{
+    AllocConsole();
+    freopen("CONOUT$", "w", stdout);
+ 
+    MODULEINFO miGame = GetModuleInfo(NULL);
+ 
+    GObjObjects_offset = ((DWORD64)miGame.lpBaseOfDll + 0x21EDE80);
+    Names_offset = (*(DWORD64*)((DWORD64)miGame.lpBaseOfDll + 0x21DD6B8));
+ 
+    GObjObjects = (TUObjectArray*)GObjObjects_offset;
+    Names = (TNameEntryArray*)Names_offset;
+ 
+    NameDump();
+    ObjectDump();
+}
+ 
+BOOL WINAPI DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
+{
+    switch (dwReason)
+    {
+    case DLL_PROCESS_ATTACH:
+        DisableThreadLibraryCalls(hModule);
+        CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)onAttach, NULL, 0, NULL);
+        return true;
+        break;
+ 
+    case DLL_PROCESS_DETACH:
+        return true;
+        break;
+    }
+}
+```
+
 BUILD TIME!<br>
 <br>
 and...<br>
